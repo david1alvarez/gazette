@@ -1,9 +1,12 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django_jsonform.models.fields import ArrayField
 
 
 class City(models.Model):
     name = models.CharField(null=True, blank=True, max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Faction(models.Model):
@@ -18,6 +21,9 @@ class Faction(models.Model):
     quirks = models.TextField(null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.name
+
 
 class District(models.Model):
     name = models.CharField(null=True, blank=True, max_length=100)
@@ -26,10 +32,11 @@ class District(models.Model):
     streets_description = models.TextField(null=True, blank=True)
     streets = ArrayField(models.CharField(max_length=100))
     buildings_description = models.TextField(null=True, blank=True)
-    traits = ArrayField(
-        ArrayField(models.CharField(max_length=100))
-    )  # this doesn't work in the current admin panel
+    traits = ArrayField(ArrayField(models.CharField(max_length=100)))
     city = models.ForeignKey(City, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name
 
 
 class DistrictFaction(models.Model):
@@ -52,9 +59,25 @@ class Landmark(models.Model):
     description = models.TextField(null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.PROTECT)
 
+    def __str__(self):
+        return self.name
+
 
 class NonPlayerCharacter(models.Model):
     name = models.CharField(null=True, blank=True, max_length=100)
     description = models.TextField(null=True, blank=True)
-    adjectives = ArrayField(models.CharField(max_length=100), default=list)
-    district = models.ForeignKey(District, on_delete=models.PROTECT)
+    adjectives = ArrayField(
+        models.CharField(max_length=100),
+        default=list,
+        null=True,
+        blank=True,
+    )
+    district = models.ForeignKey(
+        District, on_delete=models.PROTECT, null=True, blank=True
+    )
+    faction = models.ForeignKey(
+        Faction, on_delete=models.PROTECT, null=True, blank=True
+    )
+
+    def __str__(self):
+        return self.name
