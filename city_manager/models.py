@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 
+class City(models.Model):
+    name: models.CharField(max_length=100)
+
+
 class Faction(models.Model):
     name = models.CharField(max_length=100)
     tier = models.IntegerField(default=0)
@@ -12,6 +16,7 @@ class Faction(models.Model):
     headquarters = models.CharField(max_length=100, null=True, blank=True)
     assets: ArrayField(models.CharField(max_length=100))
     quirks: models.CharField(null=True, blank=True)
+    city: models.ForeignKey(City, on_delete=models.PROTECT)
 
 
 class District(models.Model):
@@ -21,9 +26,8 @@ class District(models.Model):
     streets_description: models.CharField(null=True, blank=True)
     streets: ArrayField(models.CharField(max_length=100))
     buildings_description: models.CharField(null=True, blank=True)
-    traits: ArrayField(
-        ArrayField(models.CharField(max_length=100))
-    )  # [[trait, strength],]
+    traits: ArrayField(ArrayField(models.CharField(max_length=100)))
+    city: models.ForeignKey(City, on_delete=models.PROTECT)
 
 
 class DistrictFaction(models.Model):
@@ -31,20 +35,20 @@ class DistrictFaction(models.Model):
     faction: models.ForeignKey(Faction, on_delete=models.CASCADE)
 
 
-# join table, but this will require some constraints. Could do {source_faction, target_faction, relationship} and likely have duplicate
-# relationship entries, could do {faction_a, faction_b, relationship} but you'd need some way to say "get me faction_c's relationships" and pull
-# all of the relevant ones into the query
-# class FactionFaction(models.Model):
+class FactionFactionRelation(models.Model):
+    source_faction: models.ForeignKey(Faction, on_delete=models.CASCADE)
+    target_faction: models.ForeignKey(Faction, on_delete=models.CASCADE)
+    target_reputation: models.IntegerField(default=0)
 
 
-# class Landmark(models.Model):
-# name: text
-# description: text
-# district: fk.District
+class Landmark(models.Model):
+    name: models.CharField(max_length=100, null=True, blank=True)
+    description: models.CharField(null=True, blank=True)
+    district: models.ForeignKey(District, on_delete=models.PROTECT)
 
-# class NonPlayerCharacter(models.Model):
-# name: text
-# description: text
-# district: fk.District
-# faction: fk.Faction
-# adjectives: [text] (e.g. ["calculating", "confident", "calm"])
+
+class NonPlayerCharacter(models.Model):
+    name: models.CharField(max_length=100, null=True, blank=True)
+    description: models.CharField(null=True, blank=True)
+    adjectives: ArrayField(models.CharField(max_length=100), default=list)
+    district: models.ForeignKey(District, on_delete=models.PROTECT)

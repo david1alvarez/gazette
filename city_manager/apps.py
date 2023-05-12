@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class FactionManagerConfig(AppConfig):
+class CityManagerConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "faction_manager"
+    name = "city_manager"
