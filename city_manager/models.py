@@ -5,6 +5,9 @@ from django_jsonform.models.fields import ArrayField
 class City(models.Model):
     name = models.CharField(null=True, blank=True, max_length=100)
 
+    class Meta:
+        verbose_name_plural = "cities"
+
     def __str__(self):
         return self.name
 
