@@ -23,4 +23,4 @@ trap graceful_shutdown SIGINT SIGTERM
 
 /usr/local/bin/python3.8 manage.py migrate
 
-/usr/local/bin/python3.8 manage.py runserver
+/usr/local/bin/python3.8 manage.py runserver & open -a "Google Chrome" http://127.0.0.1:8000/admin
