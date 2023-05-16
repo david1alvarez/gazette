@@ -3,7 +3,7 @@ from django_jsonform.models.fields import ArrayField
 
 
 class City(models.Model):
-    name = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "cities"
@@ -13,11 +13,11 @@ class City(models.Model):
 
 
 class Faction(models.Model):
-    name = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
     tier = models.IntegerField(default=0)
     HOLD_STRENGTH = [("w", "weak"), ("s", "strong")]
     hold = models.CharField(max_length=1, choices=HOLD_STRENGTH, default="w")
-    category = models.CharField(max_length=100, null=True, blank=True)
+    category = models.CharField(null=True, blank=True, max_length=100)
     turf = ArrayField(models.CharField(max_length=100), default=list)
     headquarters = models.CharField(max_length=100, null=True, blank=True)
     assets = ArrayField(models.CharField(max_length=100))
@@ -28,8 +28,38 @@ class Faction(models.Model):
         return self.name
 
 
+class FactionClock(models.Model):
+    name = models.CharField(max_length=100, null=True, blank=True)
+    clock_segments = models.IntegerField(default=4)
+    OBJECTIVE_TYPES = [
+        ("ACQ", "acquire asset"),
+        ("CON", "contest rival"),
+        ("AID", "aid ally"),
+        ("REM", "remove rival"),
+        ("EXP", "expand gang"),
+        ("CLA", "claim territory"),
+    ]
+    objective_type = models.CharField(
+        choices=OBJECTIVE_TYPES,
+        max_length=3,
+        default="ACQ",
+    )
+    faction = models.ForeignKey(
+        Faction,
+        on_delete=models.CASCADE,
+        related_name="clock_source_faction",
+    )
+    target_faction = models.ForeignKey(
+        Faction,
+        on_delete=models.SET_NULL,
+        related_name="clock_target_faction",
+        null=True,
+        blank=True,
+    )
+
+
 class District(models.Model):
-    name = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     scene = models.TextField(null=True, blank=True)
     streets_description = models.TextField(null=True, blank=True)
@@ -49,16 +79,20 @@ class DistrictFaction(models.Model):
 
 class FactionFactionRelation(models.Model):
     source_faction = models.ForeignKey(
-        Faction, on_delete=models.CASCADE, related_name="source_faction"
+        Faction,
+        on_delete=models.CASCADE,
+        related_name="relation_source_faction",
     )
     target_faction = models.ForeignKey(
-        Faction, on_delete=models.CASCADE, related_name="target_faction"
+        Faction,
+        on_delete=models.CASCADE,
+        related_name="relation_target_faction",
     )
     target_reputation = models.IntegerField(default=0)
 
 
 class Landmark(models.Model):
-    name = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     district = models.ForeignKey(District, on_delete=models.PROTECT)
 
@@ -67,7 +101,7 @@ class Landmark(models.Model):
 
 
 class NonPlayerCharacter(models.Model):
-    name = models.CharField(null=True, blank=True, max_length=100)
+    name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     adjectives = ArrayField(
         models.CharField(max_length=100),
