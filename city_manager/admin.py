@@ -9,6 +9,7 @@ from .models import (
     FactionFactionRelation,
     Landmark,
     NonPlayerCharacter,
+    Calendar,
 )
 
 
@@ -19,12 +20,20 @@ class AdminCity(admin.ModelAdmin):
 
 @admin.register(Faction)
 class AdminFaction(admin.ModelAdmin):
-    list_display = ("name", "tier", "hold", "city", "id")
+    list_display = ("name", "tier", "hold", "city", "is_dead_or_deleted", "id")
 
 
 @admin.register(FactionClock)
 class AdminFactionClock(admin.ModelAdmin):
-    list_display = ("name", "faction", "objective_type", "id")
+    list_display = (
+        "name",
+        "faction",
+        "objective_type",
+        "max_segments",
+        "completed_segments",
+        "completed",
+        "id",
+    )
 
 
 @admin.register(District)
@@ -49,4 +58,9 @@ class AdminLandmark(admin.ModelAdmin):
 
 @admin.register(NonPlayerCharacter)
 class AdminNonPlayerCharacter(admin.ModelAdmin):
-    list_display = ("name", "district", "faction", "id")
+    list_display = ("name", "district", "faction", "is_dead_or_deleted", "id")
+
+
+@admin.register(Calendar)
+class AdminCalendar(admin.ModelAdmin):
+    list_display = ("step",)
