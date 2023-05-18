@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+import sys
+
+(major_version, minor_version) = sys.version_info[0:2]
+if major_version != 3 and minor_version < 10:
+    raise Exception("Requires python 3.10 or later")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

@@ -8,7 +8,7 @@ if ! pg_isready -U admin -d gazettedb ; then
 fi
 
 if ! pip show psycopg2-binary &> /dev/null ; then
-  pip install psycopg2-binary==2.8.4
+  pip3 install -q -r requirements.txt
 fi
 
 graceful_shutdown() {
@@ -21,6 +21,6 @@ graceful_shutdown() {
 
 trap graceful_shutdown SIGINT SIGTERM
 
-/usr/local/bin/python3.8 manage.py migrate
+python3 manage.py migrate
 
-/usr/local/bin/python3.8 manage.py runserver & open -a "Google Chrome" http://127.0.0.1:8000/admin
+python3 manage.py runserver & open -a "Google Chrome" http://127.0.0.1:8000/admin
