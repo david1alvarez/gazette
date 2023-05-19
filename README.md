@@ -21,3 +21,6 @@ This will ensure you your environment has the correct packages, and will start u
 
 ## Using the project
 The admin panel can be found at http://127.0.0.1:8000/admin/
+
+## Lucid Chart Architecture Diagram
+[Architectural Diagram](https://lucid.app/lucidchart/f95b0c3f-0cc9-45b7-a58e-01705e6f1cf2/edit?viewport_loc=-1038%2C43%2C3258%2C1723%2C0_0&invitationId=inv_b265b3e8-fcf1-408f-946c-891ef06b48ae)
