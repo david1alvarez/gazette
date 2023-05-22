@@ -1,7 +1,7 @@
+from __future__ import annotations
 from django.db import models
 from django_jsonform.models.fields import ArrayField
-
-# from city_manager.managers import FactionClockManager
+from city_manager.exceptions import RecordNotFoundException
 
 
 class City(models.Model):
@@ -29,6 +29,42 @@ class Faction(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class FactionFactionRelation(models.Model):
+    source_faction = models.ForeignKey(
+        Faction,
+        on_delete=models.CASCADE,
+        related_name="relation_source_faction",
+    )
+    target_faction = models.ForeignKey(
+        Faction,
+        on_delete=models.CASCADE,
+        related_name="relation_target_faction",
+    )
+    target_reputation = models.IntegerField(default=0)
+
+
+class FactionClockManager(models.Manager):
+    def active_clocks_for_faction(self, faction: Faction) -> FactionClockManager:
+        """Return the collection of active clocks for a given faction.
+
+        Args:
+            faction (Faction): The chosen faction
+
+        Returns:
+            _type_: _description_
+        """
+        return self.filter(faction=faction, completed=False)
+
+    def active(self) -> FactionClockManager:
+        return self.filter(completed=False)
+
+    def first(self) -> FactionClock | None:
+        return self.first()
+
+    def get(self, *args, **kwargs) -> FactionClock:
+        return self.get(*args, **kwargs)
 
 
 class FactionClock(models.Model):
@@ -62,26 +98,7 @@ class FactionClock(models.Model):
         blank=True,
     )
 
-    # objects = FactionClockManager()
-
-    def advance(self, amount) -> bool:
-        """Adjust the faction clock up or down by the amount provided. If the threshold for completion is crossed
-        (`FactionClock.completed_segments` meeting or exceeding `FactionClock.max_segments`), update `FactionClock.completed`
-
-        Args:
-            amount (int): the amount for incrementing or decrementing the clock.
-
-        Returns:
-            bool: whether the clock is completed
-        """
-        current_segments = self.completed_segments
-        self.completed_segments = current_segments + amount
-
-        self.completed = self.completed_segments >= self.max_segments
-
-        self.save()
-
-        return self.completed
+    objects = FactionClockManager()
 
 
 class District(models.Model):
@@ -101,20 +118,6 @@ class District(models.Model):
 class DistrictFaction(models.Model):
     district = models.ForeignKey(District, on_delete=models.CASCADE)
     faction = models.ForeignKey(Faction, on_delete=models.CASCADE)
-
-
-class FactionFactionRelation(models.Model):
-    source_faction = models.ForeignKey(
-        Faction,
-        on_delete=models.CASCADE,
-        related_name="relation_source_faction",
-    )
-    target_faction = models.ForeignKey(
-        Faction,
-        on_delete=models.CASCADE,
-        related_name="relation_target_faction",
-    )
-    target_reputation = models.IntegerField(default=0)
 
 
 class Landmark(models.Model):

@@ -1,11 +1,18 @@
+from logging import info
 import os
 import openai
+
+from models import Faction
 
 
 class OpenAIClient:
     org_id = openai.organization = os.getenv("OPENAI_ORGANIZATION")
     api_key = openai.api_key = os.getenv("OPENAI_API_KEY")
     model = "gpt-3.5-turbo-0301"
+
+    def create_faction_clock(self, faction: Faction):
+        info(f"new clock created for faction {faction.name}: <created_clock.name>")
+        pass
 
 
 openai.organization = os.getenv("OPENAI_ORGANIZATION")
