@@ -1,11 +1,11 @@
 from city_manager.exceptions import RecordNotFoundException
-from city_manager.api.open_ai_client import OpenAIClient
+from api import OpenAIClient
+from controllers import FactionController
 from models import (
     City,
     Faction,
     Calendar,
 )
-import random
 
 
 class TimeController:
@@ -21,8 +21,9 @@ class TimeController:
         current_date = Calendar.objects.latest()
 
         for faction in Faction.objects.all():
+            faction_controller = FactionController(faction=faction)
             try:
-                is_completed = faction.roll_clock()
+                is_completed = faction_controller.roll_clock()
             except RecordNotFoundException:
                 # warn that no records were found
                 # attempt to create new faction clocks
