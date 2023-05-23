@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import (
+from city_manager.models import (
     City,
     District,
     Faction,

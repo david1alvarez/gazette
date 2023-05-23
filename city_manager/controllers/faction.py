@@ -1,5 +1,6 @@
-from controllers import Outcome, FactionClockController
-from models import Faction, FactionClock
+from city_manager.controllers.faction_clock import FactionClockController
+from city_manager.controllers.probability import Outcome
+from city_manager.models import Faction, FactionClock
 from city_manager.exceptions import RecordNotFoundException
 from logging import error
 
@@ -39,7 +40,8 @@ class FactionController:
 
         clock_controller = FactionClockController(faction_clock=clock)
 
-        match (Outcome.roll(dice)):
+        roll = Outcome.roll(dice)
+        match roll:
             case Outcome.FAILURE:
                 return clock_controller.increment_clock(1)
             case Outcome.PARTIAL_SUCCESS:

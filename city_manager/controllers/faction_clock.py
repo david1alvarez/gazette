@@ -1,4 +1,4 @@
-from models import FactionClock
+from city_manager.models import FactionClock
 from logging import error
 
 

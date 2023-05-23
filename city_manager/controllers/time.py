@@ -1,7 +1,7 @@
 from city_manager.exceptions import RecordNotFoundException
-from api import OpenAIClient
-from controllers import FactionController
-from models import (
+from city_manager.api import OpenAIClient
+from city_manager.controllers import FactionController
+from city_manager.models import (
     City,
     Faction,
     Calendar,
