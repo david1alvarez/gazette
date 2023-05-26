@@ -1,6 +1,8 @@
 from __future__ import annotations
 from django.db import models
 from django_jsonform.models.fields import ArrayField
+from enum import Enum
+from city_manager.exceptions import InvalidInputsException
 
 
 class City(models.Model):
@@ -30,6 +32,40 @@ class Faction(models.Model):
         return self.name
 
 
+class FactionFactionRelationManager(models.Manager):
+    def create_symmetric(
+        self,
+        factions: list[Faction],
+        reputation: int = 0,
+    ) -> list[FactionFactionRelation]:
+        """Create a symmetrical relationship between factions. The reputation level will be
+        the same in both directions.
+
+        Args:
+            factions (list[Faction]): A list of two Factions, in either order.
+            reputation (int, optional): The reputation of the relationship. Defaults to 0.
+
+        Raises:
+            InvalidInputsException: Thrown if an invalid number of factions are entered.
+
+        Returns:
+            list[FactionFactionRelation]: Returns the list created FactionFactionRelation objects of length 2.
+        """
+        if len(factions) != 2:
+            raise InvalidInputsException(factions)
+        relation_1 = self.create(
+            source_faction=factions[0],
+            target_faction=factions[1],
+            target_reputation=reputation,
+        )
+        relation_2 = self.create(
+            source_faction=factions[1],
+            target_faction=factions[0],
+            target_reputation=reputation,
+        )
+        return [relation_1, relation_2]
+
+
 class FactionFactionRelation(models.Model):
     source_faction = models.ForeignKey(
         Faction,
@@ -42,6 +78,8 @@ class FactionFactionRelation(models.Model):
         related_name="relation_target_faction",
     )
     target_reputation = models.IntegerField(default=0)
+
+    objects = FactionFactionRelationManager()
 
 
 class FactionClockManager(models.Manager):
@@ -66,23 +104,32 @@ class FactionClockManager(models.Manager):
         return self.get(*args, **kwargs)
 
 
+class ClockObjectiveType(Enum):
+    ACQUIRE_ASSET = "ACQ"
+    CONTEST_RIVAL = "CON"
+    AID_ALLY = "AID"
+    REMOVE_RIVAL = "REM"
+    EXPAND_GANG = "EXP"
+    CLAIM_TERRITORY = "CLA"
+
+
 class FactionClock(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     max_segments = models.PositiveIntegerField(default=4)
     completed_segments = models.PositiveIntegerField(default=0)
     completed = models.BooleanField(default=False)
-    OBJECTIVE_TYPES = [
-        ("ACQ", "acquire asset"),
-        ("CON", "contest rival"),
-        ("AID", "aid ally"),
-        ("REM", "remove rival"),
-        ("EXP", "expand gang"),
-        ("CLA", "claim territory"),
+    OBJECTIVE_TYPES: list[(ClockObjectiveType, str)] = [
+        (ClockObjectiveType.ACQUIRE_ASSET, "acquire asset"),
+        (ClockObjectiveType.CONTEST_RIVAL, "contest rival"),
+        (ClockObjectiveType.AID_ALLY, "aid ally"),
+        (ClockObjectiveType.REMOVE_RIVAL, "remove rival"),
+        (ClockObjectiveType.EXPAND_GANG, "expand gang"),
+        (ClockObjectiveType.CLAIM_TERRITORY, "claim territory"),
     ]
     objective_type = models.CharField(
         choices=OBJECTIVE_TYPES,
         max_length=3,
-        default="ACQ",
+        default=ClockObjectiveType.ACQUIRE_ASSET,
     )
     faction = models.ForeignKey(
         Faction,
