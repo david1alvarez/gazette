@@ -3,4 +3,9 @@ from .model_tests import (
     FactionTestCase,
     FactionFactionRelationTestCase,
     FactionClockTestCase,
+    DistrictTestCase,
+    DistrictFactionTestCase,
+    LandmarkTestCase,
+    PersonTestCase,
+    CalendarTestCase,
 )

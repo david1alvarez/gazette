@@ -83,25 +83,8 @@ class FactionFactionRelation(models.Model):
 
 
 class FactionClockManager(models.Manager):
-    def active_clocks_for_faction(self, faction: Faction) -> FactionClockManager:
-        """Return the collection of active clocks for a given faction.
-
-        Args:
-            faction (Faction): The chosen faction
-
-        Returns:
-            _type_: _description_
-        """
-        return self.filter(faction=faction, completed=False)
-
     def active(self) -> FactionClockManager:
         return self.filter(completed=False)
-
-    def first(self) -> FactionClock | None:
-        return self.first()
-
-    def get(self, *args, **kwargs) -> FactionClock:
-        return self.get(*args, **kwargs)
 
 
 class ClockObjectiveType(Enum):
@@ -111,6 +94,14 @@ class ClockObjectiveType(Enum):
     REMOVE_RIVAL = "REM"
     EXPAND_GANG = "EXP"
     CLAIM_TERRITORY = "CLA"
+
+    def __str__(self):
+        """String method override to allow database queries to use the three-letter abbreviation.
+
+        Returns:
+            Literal['ACQ', 'CON', 'AID', 'REM', 'EXP', 'CLA']: Three-letter abbreviation of the objective types
+        """
+        return self.value
 
 
 class FactionClock(models.Model):
@@ -175,7 +166,7 @@ class Landmark(models.Model):
         return self.name
 
 
-class NonPlayerCharacter(models.Model):
+class Person(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     adjectives = ArrayField(

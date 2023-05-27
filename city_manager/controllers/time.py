@@ -11,7 +11,7 @@ from city_manager.models import (
 class TimeController:
     city: City
 
-    def __init__(self, city=None):
+    def __init__(self, city: City = None):
         if isinstance(city, None):
             self.City = City.objects.first()
         self.city = city

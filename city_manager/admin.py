@@ -8,7 +8,7 @@ from city_manager.models import (
     DistrictFaction,
     FactionFactionRelation,
     Landmark,
-    NonPlayerCharacter,
+    Person,
     Calendar,
 )
 
@@ -56,8 +56,8 @@ class AdminLandmark(admin.ModelAdmin):
     list_display = ("name", "district", "id")
 
 
-@admin.register(NonPlayerCharacter)
-class AdminNonPlayerCharacter(admin.ModelAdmin):
+@admin.register(Person)
+class AdminPerson(admin.ModelAdmin):
     list_display = ("name", "district", "faction", "is_dead_or_deleted", "id")
 
 

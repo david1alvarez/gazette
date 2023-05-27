@@ -9,6 +9,10 @@ class FactionController:
     def __init__(self, faction: Faction):
         self.faction = faction
 
+    def active_clocks(self) -> list[FactionClock]:
+        clocks = FactionClock.objects.filter(faction=self, completed=False)
+        return list(clocks)
+
     def roll_clock(self, dice=1, clock_id: int = None) -> bool:
         """Roll the advancement of one of the faction's clocks
 
