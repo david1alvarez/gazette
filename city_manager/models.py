@@ -99,7 +99,7 @@ class ClockObjectiveType(Enum):
         """String method override to allow database queries to use the three-letter abbreviation.
 
         Returns:
-            Literal['ACQ', 'CON', 'AID', 'REM', 'EXP', 'CLA']: Three-letter abbreviation of the objective types
+            Literal["ACQ", "CON", "AID", "REM", "EXP", "CLA"]: Three-letter abbreviation of the objective types
         """
         return self.value
 
@@ -136,6 +136,9 @@ class FactionClock(models.Model):
     )
 
     objects = FactionClockManager()
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class District(models.Model):

@@ -3,6 +3,7 @@ from city_manager.exceptions import InvalidInputsException
 from django.test import TestCase
 
 from city_manager.models import (
+    Calendar,
     City,
     District,
     DistrictFaction,
@@ -10,6 +11,8 @@ from city_manager.models import (
     FactionClock,
     ClockObjectiveType,
     FactionFactionRelation,
+    Landmark,
+    Person,
 )
 
 
@@ -146,6 +149,16 @@ class FactionFactionRelationTestCase(TestCase):
         self.assertNotEqual(relation_1.target_reputation, relation_2.target_reputation)
 
 
+class ClockObjectiveTypeTestCase(TestCase):
+    def test_string_representation(self):
+        self.assertEqual("ACQ", str(ClockObjectiveType.ACQUIRE_ASSET))
+        self.assertEqual("CON", str(ClockObjectiveType.CONTEST_RIVAL))
+        self.assertEqual("AID", str(ClockObjectiveType.AID_ALLY))
+        self.assertEqual("REM", str(ClockObjectiveType.REMOVE_RIVAL))
+        self.assertEqual("EXP", str(ClockObjectiveType.EXPAND_GANG))
+        self.assertEqual("CLA", str(ClockObjectiveType.CLAIM_TERRITORY))
+
+
 class FactionClockTestCase(TestCase):
     def setUp(self):
         test_city = City.objects.create(name="test city")
@@ -189,6 +202,10 @@ class FactionClockTestCase(TestCase):
     def test_setup(self):
         self.assertEqual(len(FactionClock.objects.all()), 2)
 
+    def test_str_method(self):
+        clock = FactionClock.objects.get(name="Assassinate the emperor")
+        self.assertEqual(str(clock), clock.name)
+
     def test_active(self):
         faction = Faction.objects.get(name="The McGuffins")
         self.assertEqual(
@@ -217,6 +234,10 @@ class DistrictTestCase(TestCase):
 
     def test_setup(self):
         self.assertEqual(len(District.objects.all()), 1)
+
+    def test_str_method(self):
+        district = District.objects.get(name="Test District")
+        self.assertEqual(str(district), district.name)
 
 
 class DistrictFactionTestCase(TestCase):
@@ -255,12 +276,85 @@ class DistrictFactionTestCase(TestCase):
 
 
 class LandmarkTestCase(TestCase):
-    pass
+    def setUp(self):
+        city = city = City.objects.create(name="Rome")
+        district = District.objects.create(
+            name="Test District",
+            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
+            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
+            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
+            streets=["trottoria"],
+            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
+            traits=[
+                ["Wealth", 1],
+                ["Security and Safety", 3],
+                ["Criminal Influence", 0],
+                ["Occult Influence", 3],
+            ],
+            city=city,
+        )
+        Landmark.objects.create(
+            name="The old townhouse",
+            description="An old run-down building that housed the local government before The Collapse.",
+            district=district,
+        )
+
+    def test_setup(self):
+        self.assertEqual(len(Landmark.objects.all()), 1)
+
+    def test_str_method(self):
+        landmark = Landmark.objects.get(name="The old townhouse")
+        self.assertEqual(str(landmark), landmark.name)
 
 
 class PersonTestCase(TestCase):
-    pass
+    def setUp(self):
+        city = city = City.objects.create(name="Rome")
+        district = District.objects.create(
+            name="Test District",
+            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
+            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
+            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
+            streets=["trottoria"],
+            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
+            traits=[
+                ["Wealth", 1],
+                ["Security and Safety", 3],
+                ["Criminal Influence", 0],
+                ["Occult Influence", 3],
+            ],
+            city=city,
+        )
+        faction = Faction.objects.create(
+            name="The Fates",
+            tier=2,
+            hold="s",
+            category="Witches",
+            turf=["The house at the end of the road", "seventy olive trees"],
+            headquarters="The basement underneath the old town hall",
+            assets=["Eyes", "Cauldrons"],
+            quirks="They preach respect for one's elders.",
+            city=city,
+        )
+        Person.objects.create(
+            name="Hecate",
+            description="An ancient witch with unknowable occult plans.",
+            adjectives=["cunning", "ancient", "powerful"],
+            district=district,
+            faction=faction,
+        )
+
+    def test_setup(self):
+        self.assertEqual(len(Person.objects.all()), 1)
+
+    def test_str_method(self):
+        person = Person.objects.get(name="Hecate")
+        self.assertEqual(str(person), person.name)
 
 
 class CalendarTestCase(TestCase):
-    pass
+    def setUp(self):
+        Calendar.objects.create()
+
+    def test_setup(self):
+        self.assertEqual(len(Calendar.objects.all()), 1)
