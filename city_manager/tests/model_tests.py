@@ -14,12 +14,22 @@ from city_manager.models import (
     Landmark,
     Person,
 )
+from city_manager.tests.factory import (
+    CalendarFactory,
+    CityFactory,
+    DistrictFactionFactory,
+    DistrictFactory,
+    FactionClockFactory,
+    FactionFactory,
+    LandmarkFactory,
+    PersonFactory,
+)
 
 
 class CityTestCase(TestCase):
     def setUp(self):
-        City.objects.create(name="paris")
-        City.objects.create(name="tokyo")
+        CityFactory(name="paris")
+        CityFactory()
 
     # TODO check if teardown step is needed or automatic
 
@@ -38,19 +48,7 @@ class CityTestCase(TestCase):
 
 class FactionTestCase(TestCase):
     def setUp(self):
-        test_city = City.objects.create(name="test city")
-        # TODO: Investigate Faker, or other mock wrappers
-        Faction.objects.create(
-            name="The McGuffins",
-            tier=2,
-            hold="s",
-            category="Testers",
-            turf=["The testcase", "Not the real world"],
-            headquarters="FactionTestCase",
-            assets=["test 1", "test 2"],
-            quirks="They don't actually exist",
-            city=test_city,
-        )
+        FactionFactory(name="The McGuffins")
 
     def test_setup(self):
         self.assertEqual(len(Faction.objects.all()), 1)
@@ -67,38 +65,9 @@ class FactionTestCase(TestCase):
 class FactionFactionRelationTestCase(TestCase):
     def setUp(self):
         test_city = City.objects.create(name="test city")
-        faction_1 = Faction.objects.create(
-            name="The McGuffins",
-            tier=2,
-            hold="s",
-            category="Testers",
-            turf=["The testcase", "Not the real world"],
-            headquarters="FactionTestCase",
-            assets=["test 1", "test 2"],
-            quirks="They don't actually exist",
-            city=test_city,
-        )
-        faction_2 = Faction.objects.create(
-            name="The Unobtanium Seekers",
-            tier=1,
-            hold="w",
-            category="Testers",
-            turf=["The other testcase", "Not the real world"],
-            headquarters="FactionTestCase2",
-            assets=["test 1", "test 2"],
-            quirks="They don't actually exist",
-            city=test_city,
-        )
-        faction_3 = Faction.objects.create(
-            name="Why do you exist?",
-            tier=1,
-            hold="w",
-            category="?",
-            headquarters="Nullspace",
-            assets=["a great empty void"],
-            quirks="Unsurprisingly, they also don't actually exist",
-            city=test_city,
-        )
+        faction_1 = FactionFactory(name="The McGuffins", city=test_city)
+        faction_2 = FactionFactory(name="The Unobtanium Seekers", city=test_city)
+        faction_3 = FactionFactory(name="Why do you exist?", city=test_city)
         FactionFactionRelation.objects.create_symmetric(
             factions=[faction_1, faction_2],
             reputation=2,
@@ -161,38 +130,16 @@ class ClockObjectiveTypeTestCase(TestCase):
 
 class FactionClockTestCase(TestCase):
     def setUp(self):
-        test_city = City.objects.create(name="test city")
-        faction = Faction.objects.create(
-            name="The McGuffins",
-            tier=2,
-            hold="s",
-            category="Testers",
-            turf=["The testcase", "Not the real world"],
-            headquarters="FactionTestCase",
-            assets=["test 1", "test 2"],
-            quirks="They don't actually exist",
-            city=test_city,
-        )
-        target_faction = Faction.objects.create(
-            name="Emperor Supreme",
-            tier=5,
-            hold="s",
-            category="Lord",
-            turf=["Life", "The Universe", "Everything"],
-            headquarters="Earth 2",
-            assets=["Three heads"],
-            quirks="Owns everything",
-            city=test_city,
-        )
+        test_city = CityFactory()
+        faction = FactionFactory(name="The McGuffins", city=test_city)
+        target_faction = FactionFactory(name="Emperor Supreme", city=test_city)
         FactionClock.objects.create(
             name="Assassinate the emperor",
             objective_type=ClockObjectiveType.REMOVE_RIVAL,
             faction=faction,
             target_faction=target_faction,
         )
-        FactionClock.objects.create(
-            name="Overthrow the candy store",
-            objective_type=ClockObjectiveType.CLAIM_TERRITORY,
+        FactionClockFactory(
             max_segments=4,
             completed_segments=4,
             completed=True,
@@ -215,21 +162,8 @@ class FactionClockTestCase(TestCase):
 
 class DistrictTestCase(TestCase):
     def setUp(self):
-        city = City.objects.create(name="Rome")
-        District.objects.create(
+        DistrictFactory(
             name="Test District",
-            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
-            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
-            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
-            streets=["trottoria"],
-            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
-            traits=[
-                ["Wealth", 1],
-                ["Security and Safety", 3],
-                ["Criminal Influence", 0],
-                ["Occult Influence", 3],
-            ],
-            city=city,
         )
 
     def test_setup(self):
@@ -242,34 +176,7 @@ class DistrictTestCase(TestCase):
 
 class DistrictFactionTestCase(TestCase):
     def setUp(self):
-        city = city = City.objects.create(name="Rome")
-        district = District.objects.create(
-            name="Test District",
-            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
-            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
-            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
-            streets=["trottoria"],
-            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
-            traits=[
-                ["Wealth", 1],
-                ["Security and Safety", 3],
-                ["Criminal Influence", 0],
-                ["Occult Influence", 3],
-            ],
-            city=city,
-        )
-        faction = Faction.objects.create(
-            name="The Fates",
-            tier=2,
-            hold="s",
-            category="Witches",
-            turf=["The house at the end of the road", "seventy olive trees"],
-            headquarters="The basement underneath the old town hall",
-            assets=["Eyes", "Cauldrons"],
-            quirks="They preach respect for one's elders.",
-            city=city,
-        )
-        DistrictFaction.objects.create(district=district, faction=faction)
+        DistrictFactionFactory()
 
     def test_setup(self):
         self.assertEqual(len(DistrictFaction.objects.all()), 1)
@@ -277,26 +184,8 @@ class DistrictFactionTestCase(TestCase):
 
 class LandmarkTestCase(TestCase):
     def setUp(self):
-        city = city = City.objects.create(name="Rome")
-        district = District.objects.create(
-            name="Test District",
-            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
-            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
-            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
-            streets=["trottoria"],
-            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
-            traits=[
-                ["Wealth", 1],
-                ["Security and Safety", 3],
-                ["Criminal Influence", 0],
-                ["Occult Influence", 3],
-            ],
-            city=city,
-        )
-        Landmark.objects.create(
+        LandmarkFactory(
             name="The old townhouse",
-            description="An old run-down building that housed the local government before The Collapse.",
-            district=district,
         )
 
     def test_setup(self):
@@ -309,39 +198,8 @@ class LandmarkTestCase(TestCase):
 
 class PersonTestCase(TestCase):
     def setUp(self):
-        city = city = City.objects.create(name="Rome")
-        district = District.objects.create(
-            name="Test District",
-            description="Low buildings with thatched roofs crowd small winding streets in this quiet neighborhood.",
-            scene="Olive-seller tending to a cart with freshly harvested olives and local olive oil.",
-            streets_description="Winding poorly-lit cobblestone streets create a mazelike network.",
-            streets=["trottoria"],
-            buildings_description="Low thatched-roof buildings with narrow wooden doors.",
-            traits=[
-                ["Wealth", 1],
-                ["Security and Safety", 3],
-                ["Criminal Influence", 0],
-                ["Occult Influence", 3],
-            ],
-            city=city,
-        )
-        faction = Faction.objects.create(
-            name="The Fates",
-            tier=2,
-            hold="s",
-            category="Witches",
-            turf=["The house at the end of the road", "seventy olive trees"],
-            headquarters="The basement underneath the old town hall",
-            assets=["Eyes", "Cauldrons"],
-            quirks="They preach respect for one's elders.",
-            city=city,
-        )
-        Person.objects.create(
+        PersonFactory(
             name="Hecate",
-            description="An ancient witch with unknowable occult plans.",
-            adjectives=["cunning", "ancient", "powerful"],
-            district=district,
-            faction=faction,
         )
 
     def test_setup(self):
@@ -354,7 +212,7 @@ class PersonTestCase(TestCase):
 
 class CalendarTestCase(TestCase):
     def setUp(self):
-        Calendar.objects.create()
+        CalendarFactory()
 
     def test_setup(self):
         self.assertEqual(len(Calendar.objects.all()), 1)
