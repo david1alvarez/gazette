@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from .models import City
 
-# Create your views here.
+
+def index(request):
+    return HttpResponse("Welcome to the City Manager")
+
+
+def cities(request):
+    return HttpResponse(City.objects.all())
