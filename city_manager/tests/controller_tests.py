@@ -7,7 +7,7 @@ from city_manager.models import Faction, FactionFactionRelation
 from city_manager.tests.factory import FactionFactory
 
 
-class FactionFactionRelationControllerTestCase(TestCase):
+class FactionFactionRelationControllerTests(TestCase):
     def setUp(self):
         FactionFactory.create_batch(3)
 

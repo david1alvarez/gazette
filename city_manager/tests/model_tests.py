@@ -25,7 +25,7 @@ from city_manager.tests.factory import (
 )
 
 
-class CityTestCase(TestCase):
+class CityTests(TestCase):
     def setUp(self):
         CityFactory(name="paris")
         CityFactory()
@@ -43,7 +43,7 @@ class CityTestCase(TestCase):
             City.objects.create(name=too_long_name)
 
 
-class FactionTestCase(TestCase):
+class FactionTests(TestCase):
     def setUp(self):
         FactionFactory(name="The McGuffins")
 
@@ -59,7 +59,7 @@ class FactionTestCase(TestCase):
         self.assertFalse(faction.is_dead_or_deleted)
 
 
-class FactionFactionRelationTestCase(TestCase):
+class FactionFactionRelationTests(TestCase):
     def setUp(self):
         test_city = City.objects.create(name="test city")
         faction_1 = FactionFactory(name="The McGuffins", city=test_city)
@@ -92,7 +92,7 @@ class FactionFactionRelationTestCase(TestCase):
         self.assertNotEqual(relation_1.target_reputation, relation_2.target_reputation)
 
 
-class ClockObjectiveTypeTestCase(TestCase):
+class ClockObjectiveTypeTests(TestCase):
     def test_string_representation(self):
         self.assertEqual("ACQ", str(ClockObjectiveType.ACQUIRE_ASSET))
         self.assertEqual("CON", str(ClockObjectiveType.CONTEST_RIVAL))
@@ -102,7 +102,7 @@ class ClockObjectiveTypeTestCase(TestCase):
         self.assertEqual("CLA", str(ClockObjectiveType.CLAIM_TERRITORY))
 
 
-class FactionClockTestCase(TestCase):
+class FactionClockTests(TestCase):
     def setUp(self):
         test_city = CityFactory()
         faction = FactionFactory(name="The McGuffins", city=test_city)
@@ -134,7 +134,7 @@ class FactionClockTestCase(TestCase):
         )
 
 
-class DistrictTestCase(TestCase):
+class DistrictTests(TestCase):
     def setUp(self):
         DistrictFactory(
             name="Test District",
@@ -148,7 +148,7 @@ class DistrictTestCase(TestCase):
         self.assertEqual(str(district), district.name)
 
 
-class DistrictFactionTestCase(TestCase):
+class DistrictFactionTests(TestCase):
     def setUp(self):
         DistrictFactionFactory()
 
@@ -156,7 +156,7 @@ class DistrictFactionTestCase(TestCase):
         self.assertEqual(len(DistrictFaction.objects.all()), 1)
 
 
-class LandmarkTestCase(TestCase):
+class LandmarkTests(TestCase):
     def setUp(self):
         LandmarkFactory(
             name="The old townhouse",
@@ -170,7 +170,7 @@ class LandmarkTestCase(TestCase):
         self.assertEqual(str(landmark), landmark.name)
 
 
-class PersonTestCase(TestCase):
+class PersonTests(TestCase):
     def setUp(self):
         PersonFactory(
             name="Hecate",
@@ -184,7 +184,7 @@ class PersonTestCase(TestCase):
         self.assertEqual(str(person), person.name)
 
 
-class CalendarTestCase(TestCase):
+class CalendarTests(TestCase):
     def setUp(self):
         CalendarFactory()
 

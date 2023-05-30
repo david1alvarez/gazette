@@ -1,14 +1,14 @@
 from .model_tests import (
-    CityTestCase,
-    FactionTestCase,
-    FactionFactionRelationTestCase,
-    ClockObjectiveTypeTestCase,
-    FactionClockTestCase,
-    DistrictTestCase,
-    DistrictFactionTestCase,
-    LandmarkTestCase,
-    PersonTestCase,
-    CalendarTestCase,
+    CityTests,
+    FactionTests,
+    FactionFactionRelationTests,
+    ClockObjectiveTypeTests,
+    FactionClockTests,
+    DistrictTests,
+    DistrictFactionTests,
+    LandmarkTests,
+    PersonTests,
+    CalendarTests,
 )
 
-from .controller_tests import FactionFactionRelationControllerTestCase
+from .controller_tests import FactionFactionRelationControllerTests
