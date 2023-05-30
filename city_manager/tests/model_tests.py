@@ -31,8 +31,6 @@ class CityTestCase(TestCase):
         CityFactory(name="paris")
         CityFactory()
 
-    # TODO check if teardown step is needed or automatic
-
     def test_setup(self):
         self.assertEqual(len(City.objects.all()), 2)
 
@@ -67,46 +65,23 @@ class FactionFactionRelationTestCase(TestCase):
         test_city = City.objects.create(name="test city")
         faction_1 = FactionFactory(name="The McGuffins", city=test_city)
         faction_2 = FactionFactory(name="The Unobtanium Seekers", city=test_city)
-        faction_3 = FactionFactory(name="Why do you exist?", city=test_city)
-        FactionFactionRelation.objects.create_symmetric(
-            factions=[faction_1, faction_2],
-            reputation=2,
-        )
         FactionFactionRelation.objects.create(
             source_faction=faction_1,
-            target_faction=faction_3,
+            target_faction=faction_2,
             target_reputation=1,
         )
         FactionFactionRelation.objects.create(
-            source_faction=faction_3,
+            source_faction=faction_2,
             target_faction=faction_1,
             target_reputation=-1,
         )
 
     def test_setup(self):
-        self.assertEqual(len(FactionFactionRelation.objects.all()), 4)
-
-    def test_create_symmetric_faction_length_error(self):
-        factions = list(Faction.objects.all())
-        with self.assertRaises(InvalidInputsException):
-            FactionFactionRelation.objects.create_symmetric(factions)
-
-    def test_create_symmetric(self):
-        faction_1 = Faction.objects.get(name="The McGuffins")
-        faction_2 = Faction.objects.get(name="The Unobtanium Seekers")
-        relation_1 = FactionFactionRelation.objects.get(
-            source_faction=faction_1,
-            target_faction=faction_2,
-        )
-        relation_2 = FactionFactionRelation.objects.get(
-            source_faction=faction_2,
-            target_faction=faction_1,
-        )
-        self.assertEqual(relation_1.target_reputation, relation_2.target_reputation)
+        self.assertEqual(len(FactionFactionRelation.objects.all()), 2)
 
     def test_create_asymmetric(self):
         faction_1 = Faction.objects.get(name="The McGuffins")
-        faction_2 = Faction.objects.get(name="Why do you exist?")
+        faction_2 = Faction.objects.get(name="The Unobtanium Seekers")
         relation_1 = FactionFactionRelation.objects.get(
             source_faction=faction_1,
             target_faction=faction_2,

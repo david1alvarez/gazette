@@ -10,3 +10,5 @@ from .model_tests import (
     PersonTestCase,
     CalendarTestCase,
 )
+
+from .controller_tests import FactionFactionRelationControllerTestCase

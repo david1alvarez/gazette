@@ -35,41 +35,6 @@ class Faction(models.Model):
         return self.name
 
 
-class FactionFactionRelationManager(models.Manager):
-    # TODO: this belongs in a controller
-    def create_symmetric(
-        self,
-        factions: list[Faction],
-        reputation: int = 0,
-    ) -> list[FactionFactionRelation]:
-        """Create a symmetrical relationship between factions. The reputation level will be
-        the same in both directions.
-
-        Args:
-            factions (list[Faction]): A list of two Factions, in either order.
-            reputation (int, optional): The reputation of the relationship. Defaults to 0.
-
-        Raises:
-            InvalidInputsException: Thrown if an invalid number of factions are entered.
-
-        Returns:
-            list[FactionFactionRelation]: Returns the list created FactionFactionRelation objects of length 2.
-        """
-        if len(factions) != 2:
-            raise InvalidInputsException(factions)
-        relation_1 = self.create(
-            source_faction=factions[0],
-            target_faction=factions[1],
-            target_reputation=reputation,
-        )
-        relation_2 = self.create(
-            source_faction=factions[1],
-            target_faction=factions[0],
-            target_reputation=reputation,
-        )
-        return [relation_1, relation_2]
-
-
 class FactionFactionRelation(models.Model):
     source_faction = models.ForeignKey(
         Faction,
@@ -82,8 +47,6 @@ class FactionFactionRelation(models.Model):
         related_name="relation_target_faction",
     )
     target_reputation = models.IntegerField(default=0)
-
-    objects = FactionFactionRelationManager()
 
     class Meta:
         unique_together = [["source_faction", "target_faction"]]
