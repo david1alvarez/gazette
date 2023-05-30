@@ -28,11 +28,15 @@ class Faction(models.Model):
     city = models.ForeignKey(City, on_delete=models.PROTECT)
     is_dead_or_deleted = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [models.Index(fields=["is_dead_or_deleted"])]
+
     def __str__(self):
         return self.name
 
 
 class FactionFactionRelationManager(models.Manager):
+    # TODO: this belongs in a controller
     def create_symmetric(
         self,
         factions: list[Faction],
@@ -81,13 +85,13 @@ class FactionFactionRelation(models.Model):
 
     objects = FactionFactionRelationManager()
 
-
-class FactionClockManager(models.Manager):
-    def active(self) -> FactionClockManager:
-        return self.filter(completed=False)
+    class Meta:
+        unique_together = [["source_faction", "target_faction"]]
+        indexes = [models.Index(fields=["source_faction"])]
 
 
 class ClockObjectiveType(Enum):
+    # TODO: Update this to be integer fields (e.g. ClockObjectiveType.ACQUIRE_ASSET = 1) to improve db query times
     ACQUIRE_ASSET = "ACQ"
     CONTEST_RIVAL = "CON"
     AID_ALLY = "AID"
@@ -102,6 +106,11 @@ class ClockObjectiveType(Enum):
             Literal["ACQ", "CON", "AID", "REM", "EXP", "CLA"]: Three-letter abbreviation of the objective types
         """
         return self.value
+
+
+class FactionClockManager(models.Manager):
+    def active(self) -> FactionClockManager:
+        return self.filter(completed=False)
 
 
 class FactionClock(models.Model):
@@ -137,6 +146,9 @@ class FactionClock(models.Model):
 
     objects = FactionClockManager()
 
+    class Meta:
+        indexes = [models.Index(fields=["completed"]), models.Index(fields=["faction"])]
+
     def __str__(self) -> str:
         return self.name
 
@@ -158,6 +170,9 @@ class District(models.Model):
 class DistrictFaction(models.Model):
     district = models.ForeignKey(District, on_delete=models.CASCADE)
     faction = models.ForeignKey(Faction, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = [["district", "faction"]]
 
 
 class Landmark(models.Model):
@@ -191,6 +206,9 @@ class Person(models.Model):
         blank=True,
     )
     is_dead_or_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [models.Index(fields=["is_dead_or_deleted"])]
 
     def __str__(self):
         return self.name
