@@ -1,4 +1,3 @@
-from city_manager.exceptions import RecordNotFoundException
 from city_manager.api import OpenAIClient
 from city_manager.controllers import FactionController
 from city_manager.models import (
@@ -24,7 +23,7 @@ class TimeController:
             faction_controller = FactionController(faction=faction)
             try:
                 is_completed = faction_controller.roll_clock()
-            except RecordNotFoundException:
+            except Faction.DoesNotExist():
                 # warn that no records were found
                 # attempt to create new faction clocks
                 pass

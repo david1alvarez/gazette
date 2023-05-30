@@ -1,5 +1,4 @@
 from django.db.utils import DataError
-from city_manager.exceptions import InvalidInputsException
 from django.test import TestCase
 
 from city_manager.models import (

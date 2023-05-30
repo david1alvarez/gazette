@@ -2,7 +2,6 @@ from __future__ import annotations
 from django.db import models
 from django_jsonform.models.fields import ArrayField
 from enum import Enum
-from city_manager.exceptions import InvalidInputsException
 
 
 class City(models.Model):

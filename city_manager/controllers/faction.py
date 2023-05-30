@@ -1,7 +1,6 @@
 from city_manager.controllers.faction_clock import FactionClockController
 from city_manager.controllers.probability import Outcome
 from city_manager.models import Faction, FactionClock
-from city_manager.exceptions import RecordNotFoundException
 from logging import error
 
 
@@ -34,11 +33,11 @@ class FactionController:
             try:
                 clock = FactionClock.objects.active().get(id=clock_id)
                 if clock.faction != self.faction:
-                    raise RecordNotFoundException(FactionClock)
+                    raise FactionClock.DoesNotExist()
             except:
                 error(f"no faction clock found for id {clock_id}")
         if isinstance(clock, None):
-            raise RecordNotFoundException(
+            raise FactionClock.DoesNotExist(
                 "Expected faction to have existing objectives, found none."
             )
 
