@@ -14,17 +14,17 @@ from city_manager.models import (
 
 
 @admin.register(City)
-class AdminCity(admin.ModelAdmin):
+class CityAdmin(admin.ModelAdmin):
     list_display = ("name", "id")
 
 
 @admin.register(Faction)
-class AdminFaction(admin.ModelAdmin):
+class FactionAdmin(admin.ModelAdmin):
     list_display = ("name", "tier", "hold", "city", "is_dead_or_deleted", "id")
 
 
 @admin.register(FactionClock)
-class AdminFactionClock(admin.ModelAdmin):
+class FactionClockAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "faction",
@@ -37,30 +37,30 @@ class AdminFactionClock(admin.ModelAdmin):
 
 
 @admin.register(District)
-class AdminDistrict(admin.ModelAdmin):
+class DistrictAdmin(admin.ModelAdmin):
     list_display = ("name", "city", "id")
 
 
 @admin.register(DistrictFaction)
-class AdminDistrictFaction(admin.ModelAdmin):
+class DistrictFactionAdmin(admin.ModelAdmin):
     list_display = ("district", "faction", "id")
 
 
 @admin.register(FactionFactionRelation)
-class AdminFactionFactionRelation(admin.ModelAdmin):
+class FactionFactionRelationAdmin(admin.ModelAdmin):
     list_display = ("source_faction", "target_faction", "target_reputation", "id")
 
 
 @admin.register(Landmark)
-class AdminLandmark(admin.ModelAdmin):
+class LandmarkAdmin(admin.ModelAdmin):
     list_display = ("name", "district", "id")
 
 
 @admin.register(Person)
-class AdminPerson(admin.ModelAdmin):
+class PersonAdmin(admin.ModelAdmin):
     list_display = ("name", "district", "faction", "is_dead_or_deleted", "id")
 
 
 @admin.register(Calendar)
-class AdminCalendar(admin.ModelAdmin):
+class CalendarAdmin(admin.ModelAdmin):
     list_display = ("step",)
