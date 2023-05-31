@@ -1,8 +1,7 @@
 from django.urls import path
-
-from . import views
+from .views import CityListView
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path("cities", views.cities, name="cities"),
+    # path("", views.index, name="index"),
+    path("cities", CityListView.as_view()),
 ]
