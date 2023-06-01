@@ -1,21 +1,24 @@
-# from django.http import HttpResponse
-# from .models import City
-
-
-# def index(request):
-#     return HttpResponse("Welcome to the City Manager")
-
-
-# def cities(request):
-#     return HttpResponse(City.objects.all())
-
-from django.shortcuts import render
-from rest_framework import generics, status
-from .serializers import CitySerializer
-
+from city_manager.serializers import CitySerializer
 from .models import City
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import permissions
 
 
-class CityListView(generics.ListAPIView):
-    model = City
-    serializer_class = CitySerializer
+class CityApiView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        cities = City.objects.all()
+        serializer = CitySerializer(cities, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        data = {"name": request.data.get("name")}
+        serializer = CitySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
