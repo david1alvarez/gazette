@@ -11,4 +11,8 @@ from .model_tests import (
     CalendarTests,
 )
 
-from .controller_tests import FactionFactionRelationControllerTests
+from .controller_tests import (
+    FactionClockControllerTests,
+    FactionFactionRelationControllerTests,
+    FactionControllerTests,
+)

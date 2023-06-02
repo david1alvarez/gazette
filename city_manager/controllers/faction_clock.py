@@ -1,5 +1,5 @@
 from city_manager.models import FactionClock
-from logging import error
+from logging import warning
 
 
 class FactionClockController:
@@ -18,7 +18,7 @@ class FactionClockController:
         """
         new_amount = self.faction_clock.completed_segments + amount
         if new_amount < 0:
-            error(
+            warning(
                 f"Setting a faction clock to below 0 is not permitted. Updating clock '{self.faction_clock.name}' progress to 0"
             )
             new_amount = 0

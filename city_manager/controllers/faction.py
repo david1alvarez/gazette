@@ -9,7 +9,7 @@ class FactionController:
         self.faction = faction
 
     def active_clocks(self) -> list[FactionClock]:
-        clocks = FactionClock.objects.filter(faction=self, completed=False)
+        clocks = FactionClock.objects.filter(faction=self.faction, completed=False)
         return list(clocks)
 
     def roll_clock(self, dice=1, clock_id: int = None) -> bool:
