@@ -14,6 +14,11 @@ class City(models.Model):
         return self.name
 
 
+class FactionManager(models.Manager):
+    def active(self) -> models.QuerySet[Faction]:
+        return self.filter(is_dead_or_deleted=False)
+
+
 class Faction(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     tier = models.PositiveIntegerField(default=0)
@@ -26,6 +31,8 @@ class Faction(models.Model):
     quirks = models.TextField(null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.PROTECT)
     is_dead_or_deleted = models.BooleanField(default=False)
+
+    objects = FactionManager()
 
     class Meta:
         indexes = [models.Index(fields=["is_dead_or_deleted"])]
@@ -71,7 +78,7 @@ class ClockObjectiveType(Enum):
 
 
 class FactionClockManager(models.Manager):
-    def active(self) -> FactionClockManager:
+    def active(self) -> models.QuerySet[FactionClock]:
         return self.filter(completed=False)
 
 
@@ -146,6 +153,11 @@ class Landmark(models.Model):
         return self.name
 
 
+class PersonManager(models.Manager):
+    def active(self) -> models.QuerySet[Person]:
+        return self.filter(is_dead_or_deleted=False)
+
+
 class Person(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -168,6 +180,8 @@ class Person(models.Model):
         blank=True,
     )
     is_dead_or_deleted = models.BooleanField(default=False)
+
+    objects = PersonManager()
 
     class Meta:
         indexes = [models.Index(fields=["is_dead_or_deleted"])]
