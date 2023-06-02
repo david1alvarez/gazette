@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "The Leading Journal of Your Favorite Fictional City",
     "author": "David Alvarez",
-    "license": "Creative Commons",
+    "license": "",
     "private": true,
     "dependencies": {
         "@emotion/react": "^11.9.3",
