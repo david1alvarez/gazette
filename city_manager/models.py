@@ -184,6 +184,7 @@ class Person(models.Model):
     objects = PersonManager()
 
     class Meta:
+        verbose_name_plural = "people"
         indexes = [models.Index(fields=["is_dead_or_deleted"])]
 
     def __str__(self):
