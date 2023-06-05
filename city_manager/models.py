@@ -4,8 +4,13 @@ from django_jsonform.models.fields import ArrayField
 from enum import Enum
 
 
+class Calendar(models.Model):
+    step = models.PositiveIntegerField(default=0)
+
+
 class City(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
+    # calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "cities"
@@ -189,7 +194,3 @@ class Person(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Calendar(models.Model):
-    step = models.AutoField(primary_key=True)
