@@ -20,6 +20,12 @@ class World(HistoricalModel):
     owner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
     clock_ticks = models.PositiveBigIntegerField(default=0)
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"<World: {self.name}>"
+
 
 class City(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -31,6 +37,9 @@ class City(HistoricalModel):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<City: {self.name}>"
 
 
 class FactionManager(models.Manager):
@@ -59,6 +68,9 @@ class Faction(HistoricalModel):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<Faction: {self.name}>"
 
 
 class FactionFactionRelation(HistoricalModel):
@@ -136,6 +148,9 @@ class FactionClock(HistoricalModel):
     def __str__(self) -> str:
         return self.name
 
+    def __repr__(self):
+        return f"<FactionClock: {self.name}>"
+
 
 class District(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -150,6 +165,9 @@ class District(HistoricalModel):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<District: {self.name}>"
 
 
 class DistrictFaction(HistoricalModel):
@@ -169,6 +187,9 @@ class Landmark(HistoricalModel):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<Landmark: {self.name}>"
 
 
 class PersonManager(models.Manager):
@@ -210,3 +231,6 @@ class Person(HistoricalModel):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<Person: {self.name}>"
