@@ -70,7 +70,31 @@ class FactionControllerTests(TestCase):
         faction = FactionFactory(name="The McGuffins")
         FactionClockFactory(completed_segments=0, max_segments=4, faction=faction)
 
+    def test__get_roll_increment(self):
+        faction = Faction.objects.get(name="The McGuffins")
+        faction = FactionController(faction=faction)
+
+        for _ in range(100):
+            increment = faction._get_roll_increment()
+            self.assertTrue(increment >= 1 and increment <= 5)
+
+    def test__get_active_clock(self):
+        faction = Faction.objects.get(name="The McGuffins")
+        faction = FactionController(faction=faction)
+
+        clock = faction._get_active_clock()
+        self.assertIsNotNone(clock)
+
     def test_roll_clock(self):
+        faction = Faction.objects.get(name="The McGuffins")
+        faction = FactionController(faction=faction)
+
+        faction._get_roll_increment = MagicMock(return_value=3)
+
+        clock = faction.roll_clock()
+        self.assertEqual(clock.completed_segments, 3)
+
+    def test_roll_clock_completes_clock(self):
         faction = Faction.objects.get(name="The McGuffins")
         faction = FactionController(faction=faction)
 

@@ -11,9 +11,7 @@ from city_manager.models import (
 class TimeController:
     city: City
 
-    def __init__(self, city: City = None):
-        if isinstance(city, None):
-            self.City = City.objects.first()
+    def __init__(self, city: City):
         self.city = city
 
     def advance_time(self) -> list[FactionClock]:
