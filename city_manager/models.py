@@ -54,14 +54,15 @@ class FactionManager(models.Manager):
 class Faction(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     tier = models.PositiveIntegerField(default=0)
     HOLD_STRENGTH = [("w", "weak"), ("s", "strong")]
-    hold = models.CharField(max_length=1, choices=HOLD_STRENGTH, default="w")
-    category = models.CharField(null=True, blank=True, max_length=100)
-    turf = ArrayField(models.CharField(max_length=100), default=list)
+    hold = models.CharField(max_length=1, choices=HOLD_STRENGTH, default="s")
+    turf = models.TextField(null=True, blank=True)
     headquarters = models.CharField(max_length=100, null=True, blank=True)
-    assets = ArrayField(models.CharField(max_length=100), default=list)
+    assets = models.TextField(null=True, blank=True)
     quirks = models.TextField(null=True, blank=True)
+    current_situation = models.TextField(null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
