@@ -68,7 +68,7 @@ class FactionFactionRelationControllerTests(TestCase):
 class FactionControllerTests(TestCase):
     def setUp(self):
         faction = FactionFactory(name="The McGuffins")
-        FactionClockFactory(completed_segments=0, faction=faction)
+        FactionClockFactory(completed_segments=0, max_segments=4, faction=faction)
 
     def test_roll_clock(self):
         faction = Faction.objects.get(name="The McGuffins")
