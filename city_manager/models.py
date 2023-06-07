@@ -1,18 +1,27 @@
 from __future__ import annotations
 from django.db import models
+from django.utils import timezone
 from django_jsonform.models.fields import ArrayField
 from enum import Enum
 import uuid
 
 
-class World(models.Model):
+class HistoricalModel(models.Model):
+    created = models.DateTimeField(default=timezone.now, blank=True)
+    modified = models.DateTimeField(default=timezone.now, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class World(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     owner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
     clock_ticks = models.PositiveBigIntegerField(default=0)
 
 
-class City(models.Model):
+class City(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     world = models.ForeignKey(World, on_delete=models.CASCADE)
@@ -29,7 +38,7 @@ class FactionManager(models.Manager):
         return self.filter(is_active=True)
 
 
-class Faction(models.Model):
+class Faction(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     tier = models.PositiveIntegerField(default=0)
@@ -52,7 +61,7 @@ class Faction(models.Model):
         return self.name
 
 
-class FactionFactionRelation(models.Model):
+class FactionFactionRelation(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     source_faction = models.ForeignKey(
         Faction,
@@ -88,7 +97,7 @@ class FactionClockManager(models.Manager):
         return self.filter(completed=False)
 
 
-class FactionClock(models.Model):
+class FactionClock(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     max_segments = models.PositiveIntegerField(default=4)
@@ -128,7 +137,7 @@ class FactionClock(models.Model):
         return self.name
 
 
-class District(models.Model):
+class District(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -143,7 +152,7 @@ class District(models.Model):
         return self.name
 
 
-class DistrictFaction(models.Model):
+class DistrictFaction(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     district = models.ForeignKey(District, on_delete=models.CASCADE)
     faction = models.ForeignKey(Faction, on_delete=models.CASCADE)
@@ -152,7 +161,7 @@ class DistrictFaction(models.Model):
         unique_together = [["district", "faction"]]
 
 
-class Landmark(models.Model):
+class Landmark(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -169,7 +178,7 @@ class PersonManager(models.Manager):
         return self.filter(is_active=True)
 
 
-class Person(models.Model):
+class Person(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
