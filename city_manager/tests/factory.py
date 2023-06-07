@@ -12,13 +12,13 @@ from city_manager.models import (
     FactionFactionRelation,
     Landmark,
     Person,
-    Calendar,
+    World,
 )
 
 
 class CalendarFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = Calendar
+        model = World
 
     step = factory.Faker("random_int", min=0)
 

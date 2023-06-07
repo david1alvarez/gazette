@@ -2,7 +2,7 @@ from django.db.utils import DataError
 from django.test import TestCase
 
 from city_manager.models import (
-    Calendar,
+    World,
     City,
     District,
     DistrictFaction,
@@ -28,10 +28,10 @@ from city_manager.tests.factory import (
 class CalendarTests(TestCase):
     def setUp(self):
         CalendarFactory()
-        print(f"Calendar.objects.all(): {Calendar.objects.all()}")
+        print(f"Calendar.objects.all(): {World.objects.all()}")
 
     def test_setup(self):
-        self.assertEqual(len(Calendar.objects.all()), 1)
+        self.assertEqual(len(World.objects.all()), 1)
 
 
 class CityTests(TestCase):
@@ -67,7 +67,7 @@ class FactionTests(TestCase):
 
     def test_not_deleted_default(self):
         faction = Faction.objects.get(name="The McGuffins")
-        self.assertFalse(faction.is_dead_or_deleted)
+        self.assertTrue(faction.is_active)
 
 
 class FactionFactionRelationTests(TestCase):
@@ -105,12 +105,12 @@ class FactionFactionRelationTests(TestCase):
 
 class ClockObjectiveTypeTests(TestCase):
     def test_string_representation(self):
-        self.assertEqual("ACQ", str(ClockObjectiveType.ACQUIRE_ASSET))
-        self.assertEqual("CON", str(ClockObjectiveType.CONTEST_RIVAL))
-        self.assertEqual("AID", str(ClockObjectiveType.AID_ALLY))
-        self.assertEqual("REM", str(ClockObjectiveType.REMOVE_RIVAL))
-        self.assertEqual("EXP", str(ClockObjectiveType.EXPAND_GANG))
-        self.assertEqual("CLA", str(ClockObjectiveType.CLAIM_TERRITORY))
+        self.assertEqual(1, int(ClockObjectiveType.ACQUIRE_ASSET))
+        self.assertEqual(2, int(ClockObjectiveType.CONTEST_RIVAL))
+        self.assertEqual(3, int(ClockObjectiveType.AID_ALLY))
+        self.assertEqual(4, int(ClockObjectiveType.REMOVE_RIVAL))
+        self.assertEqual(5, int(ClockObjectiveType.EXPAND_GANG))
+        self.assertEqual(6, int(ClockObjectiveType.CLAIM_TERRITORY))
 
 
 class FactionClockTests(TestCase):

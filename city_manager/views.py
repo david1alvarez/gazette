@@ -22,7 +22,7 @@ from .models import (
     FactionFactionRelation,
     Landmark,
     Person,
-    Calendar,
+    World,
 )
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -109,7 +109,7 @@ class FactionDetailApiView(APIView):
         faction = get_object_or_404(
             Faction,
             name=faction_name,
-            is_dead_or_deleted=False,
+            is_active=True,
         )
         serializer = FactionSerializer(faction)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -126,7 +126,7 @@ class FactionDetailApiView(APIView):
             "assets": request.data.get("assets"),
             "quirks": request.data.get("quirks"),
             "city": request.data.get("city"),
-            "is_dead_or_deleted": request.data.get("is_dead_or_deleted"),
+            "is_active": request.data.get("is_active"),
         }
         serializer = FactionSerializer(
             instance=faction_instance, data=data, partial=True
@@ -140,7 +140,7 @@ class FactionDetailApiView(APIView):
 
     def delete(self, request, faction_name, *args, **kwargs):
         faction_instance = get_object_or_404(Faction, name=faction_name)
-        faction_instance.is_dead_or_deleted = True
+        faction_instance.is_active = False
         faction_instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -159,12 +159,12 @@ class FactionFactionRelationApiView(APIView):
         source_faction = get_object_or_404(
             Faction,
             name=request.data.get("source_faction_name"),
-            is_dead_or_deleted=False,
+            is_active=True,
         )
         target_faction = get_object_or_404(
             Faction,
             name=request.data.get("target_faction_name"),
-            is_dead_or_deleted=False,
+            is_active=True,
         )
         reputation = request.data.get("target_reputation")
 
@@ -545,7 +545,7 @@ class PersonDetailApiView(APIView):
             "adjectives": request.data.get("adjectives"),
             "district": request.data.get("district"),
             "faction": request.data.get("faction"),
-            "is_dead_or_deleted": request.data.get("is_dead_or_deleted"),
+            "is_active": request.data.get("is_active"),
         }
         data["district"] = get_object_or_404(District, name=data["district"])
         data["faction"] = get_object_or_404(Faction, name=data["faction"])
@@ -565,7 +565,7 @@ class PersonDetailApiView(APIView):
 
 class CalendarApiView(APIView):
     def get(self, request, *args, **kwargs):
-        calendar = Calendar.objects.all()
+        calendar = World.objects.all()
         serializer = CalendarSerializer(calendar, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -584,12 +584,12 @@ class CalendarApiView(APIView):
 
 class CalendarDetailApiView(APIView):
     def get(self, request, step, new_step, *args, **kwargs):
-        calendar = get_object_or_404(Calendar, step=step)
+        calendar = get_object_or_404(World, step=step)
         serializer = CalendarSerializer(calendar)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, step, *args, **kwargs):
-        calendar = get_object_or_404(Calendar, step=step)
+        calendar = get_object_or_404(World, step=step)
         data = {
             "step": request.data.get("new_step"),
         }
@@ -602,6 +602,6 @@ class CalendarDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, step, *args, **kwargs):
-        calendar = get_object_or_404(Calendar, step=step)
+        calendar = get_object_or_404(World, step=step)
         calendar.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

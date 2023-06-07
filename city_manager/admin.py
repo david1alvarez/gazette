@@ -9,23 +9,23 @@ from city_manager.models import (
     FactionFactionRelation,
     Landmark,
     Person,
-    Calendar,
+    World,
 )
 
 
-@admin.register(Calendar)
-class CalendarAdmin(admin.ModelAdmin):
-    list_display = ("step",)
+@admin.register(World)
+class WorldAdmin(admin.ModelAdmin):
+    list_display = ("name", "owner", "clock_ticks", "id")
 
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ("name", "id")
+    list_display = ("name", "world", "id")
 
 
 @admin.register(Faction)
 class FactionAdmin(admin.ModelAdmin):
-    list_display = ("name", "tier", "hold", "city", "is_dead_or_deleted", "id")
+    list_display = ("name", "tier", "hold", "city", "is_active", "id")
 
 
 @admin.register(FactionClock)
@@ -63,4 +63,4 @@ class LandmarkAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ("name", "district", "faction", "is_dead_or_deleted", "id")
+    list_display = ("name", "district", "faction", "is_active", "id")

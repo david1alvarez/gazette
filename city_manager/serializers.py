@@ -8,7 +8,7 @@ from .models import (
     FactionFactionRelation,
     Landmark,
     Person,
-    Calendar,
+    World,
 )
 
 
@@ -31,7 +31,7 @@ class FactionSerializer(serializers.ModelSerializer):
             "assets",
             "quirks",
             "city",
-            "is_dead_or_deleted",
+            "is_active",
         ]
 
 
@@ -102,11 +102,11 @@ class PersonSerializer(serializers.ModelSerializer):
             "adjectives",
             "district",
             "faction",
-            "is_dead_or_deleted",
+            "is_active",
         ]
 
 
 class CalendarSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Calendar
+        model = World
         fields = ["step"]

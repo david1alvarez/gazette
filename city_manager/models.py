@@ -2,15 +2,20 @@ from __future__ import annotations
 from django.db import models
 from django_jsonform.models.fields import ArrayField
 from enum import Enum
+import uuid
 
 
-class Calendar(models.Model):
-    step = models.PositiveIntegerField(default=0)
+class World(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    owner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    clock_ticks = models.PositiveBigIntegerField(default=0)
 
 
 class City(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
-    # calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
+    world = models.ForeignKey(World, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "cities"
@@ -21,10 +26,11 @@ class City(models.Model):
 
 class FactionManager(models.Manager):
     def active(self) -> models.QuerySet[Faction]:
-        return self.filter(is_dead_or_deleted=False)
+        return self.filter(is_active=True)
 
 
 class Faction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     tier = models.PositiveIntegerField(default=0)
     HOLD_STRENGTH = [("w", "weak"), ("s", "strong")]
@@ -34,19 +40,20 @@ class Faction(models.Model):
     headquarters = models.CharField(max_length=100, null=True, blank=True)
     assets = ArrayField(models.CharField(max_length=100), default=list)
     quirks = models.TextField(null=True, blank=True)
-    city = models.ForeignKey(City, on_delete=models.PROTECT)
-    is_dead_or_deleted = models.BooleanField(default=False)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
 
     objects = FactionManager()
 
     class Meta:
-        indexes = [models.Index(fields=["is_dead_or_deleted"])]
+        indexes = [models.Index(fields=["is_active"])]
 
     def __str__(self):
         return self.name
 
 
 class FactionFactionRelation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     source_faction = models.ForeignKey(
         Faction,
         on_delete=models.CASCADE,
@@ -65,20 +72,14 @@ class FactionFactionRelation(models.Model):
 
 
 class ClockObjectiveType(Enum):
-    # TODO: Update this to be integer fields (e.g. ClockObjectiveType.ACQUIRE_ASSET = 1) to improve db query times
-    ACQUIRE_ASSET = "ACQ"
-    CONTEST_RIVAL = "CON"
-    AID_ALLY = "AID"
-    REMOVE_RIVAL = "REM"
-    EXPAND_GANG = "EXP"
-    CLAIM_TERRITORY = "CLA"
+    ACQUIRE_ASSET = 1
+    CONTEST_RIVAL = 2
+    AID_ALLY = 3
+    REMOVE_RIVAL = 4
+    EXPAND_GANG = 5
+    CLAIM_TERRITORY = 6
 
-    def __str__(self):
-        """String method override to allow database queries to use the three-letter abbreviation.
-
-        Returns:
-            Literal["ACQ", "CON", "AID", "REM", "EXP", "CLA"]: Three-letter abbreviation of the objective types
-        """
+    def __int__(self):
         return self.value
 
 
@@ -88,11 +89,12 @@ class FactionClockManager(models.Manager):
 
 
 class FactionClock(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     max_segments = models.PositiveIntegerField(default=4)
     completed_segments = models.PositiveIntegerField(default=0)
     completed = models.BooleanField(default=False)
-    OBJECTIVE_TYPES: list[(ClockObjectiveType, str)] = [
+    OBJECTIVE_TYPES: list[(ClockObjectiveType, int)] = [
         (ClockObjectiveType.ACQUIRE_ASSET, "acquire asset"),
         (ClockObjectiveType.CONTEST_RIVAL, "contest rival"),
         (ClockObjectiveType.AID_ALLY, "aid ally"),
@@ -128,6 +130,7 @@ class FactionClock(models.Model):
 
 
 class District(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     scene = models.TextField(null=True, blank=True)
@@ -135,13 +138,14 @@ class District(models.Model):
     streets = ArrayField(models.CharField(max_length=100))
     buildings_description = models.TextField(null=True, blank=True)
     traits = ArrayField(ArrayField(models.CharField(max_length=100)))
-    city = models.ForeignKey(City, on_delete=models.PROTECT)
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class DistrictFaction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     district = models.ForeignKey(District, on_delete=models.CASCADE)
     faction = models.ForeignKey(Faction, on_delete=models.CASCADE)
 
@@ -150,20 +154,24 @@ class DistrictFaction(models.Model):
 
 
 class Landmark(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    district = models.ForeignKey(District, on_delete=models.PROTECT)
+    district = models.ForeignKey(District, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class PersonManager(models.Manager):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     def active(self) -> models.QuerySet[Person]:
-        return self.filter(is_dead_or_deleted=False)
+        return self.filter(is_active=True)
 
 
 class Person(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     adjectives = ArrayField(
@@ -174,23 +182,23 @@ class Person(models.Model):
     )
     district = models.ForeignKey(
         District,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     faction = models.ForeignKey(
         Faction,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
     )
-    is_dead_or_deleted = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     objects = PersonManager()
 
     class Meta:
         verbose_name_plural = "people"
-        indexes = [models.Index(fields=["is_dead_or_deleted"])]
+        indexes = [models.Index(fields=["is_active"])]
 
     def __str__(self):
         return self.name

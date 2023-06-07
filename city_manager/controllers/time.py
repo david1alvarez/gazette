@@ -3,7 +3,7 @@ from city_manager.controllers import FactionController
 from city_manager.models import (
     City,
     Faction,
-    Calendar,
+    World,
     FactionClock,
 )
 
@@ -22,7 +22,7 @@ class TimeController:
         Returns:
             list[FactionClock]: The list of clocks completed by the rolls.
         """
-        current_date = Calendar.objects.latest()
+        current_date = World.objects.latest()
         current_date.step = current_date.step + 1
         current_date.save()
 
