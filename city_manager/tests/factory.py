@@ -16,6 +16,13 @@ from city_manager.models import (
 )
 
 
+class CalendarFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Calendar
+
+    step = factory.Faker("random_int", min=0)
+
+
 class CityFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = City
@@ -105,10 +112,3 @@ class PersonFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("name")
     description = factory.Faker("paragraph")
     adjectives = factory.Faker("words")
-
-
-class CalendarFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Calendar
-
-    step = factory.Faker("random_int", min=0)

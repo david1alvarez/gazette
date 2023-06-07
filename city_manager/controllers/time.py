@@ -4,6 +4,7 @@ from city_manager.models import (
     City,
     Faction,
     Calendar,
+    FactionClock,
 )
 
 
@@ -15,17 +16,22 @@ class TimeController:
             self.City = City.objects.first()
         self.city = city
 
-    # advance the clocks for the city's factions
-    def next(self):
-        current_date = Calendar.objects.latest()
+    def advance_time(self) -> list[FactionClock]:
+        """Advance time by one step, and roll the clocks for each faction in the city.
 
-        for faction in Faction.objects.all():
-            faction_controller = FactionController(faction=faction)
-            try:
-                is_completed = faction_controller.roll_clock()
-            except Faction.DoesNotExist():
-                # warn that no records were found
-                # attempt to create new faction clocks
-                pass
-            client = OpenAIClient()
-            client.create_faction_clock()
+        Returns:
+            list[FactionClock]: The list of clocks completed by the rolls.
+        """
+        current_date = Calendar.objects.latest()
+        current_date.step = current_date.step + 1
+        current_date.save()
+
+        factions = self.city.faction_set.all()
+        newly_completed_clocks = []
+        for faction in factions:
+            controller = FactionController(faction=faction)
+            clock = controller.roll_clock()
+            if clock.completed:
+                newly_completed_clocks.append(clock)
+
+        return newly_completed_clocks

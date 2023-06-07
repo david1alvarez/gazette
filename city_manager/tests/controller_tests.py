@@ -8,6 +8,7 @@ from city_manager.controllers.faction_faction_relation import (
 )
 from city_manager.models import Faction, FactionClock, FactionFactionRelation
 from city_manager.tests.factory import FactionClockFactory, FactionFactory
+from unittest.mock import MagicMock
 
 
 class FactionClockControllerTests(TestCase):
@@ -66,22 +67,19 @@ class FactionFactionRelationControllerTests(TestCase):
 
 class FactionControllerTests(TestCase):
     def setUp(self):
-        faction = FactionFactory()
-        FactionClockFactory.create_batch(3, faction=faction, completed_segments=0)
+        faction = FactionFactory(name="The McGuffins")
+        FactionClockFactory.create_batch(
+            3, faction=faction, completed_segments=0, max_segments=4
+        )
         FactionClockFactory(completed_segments=4, faction=faction)
 
-    def test_active_clocks(self):
-        faction = Faction.objects.first()
-        faction_controller = FactionController(faction=faction)
-        active_clocks = faction_controller.active_clocks()
-        self.assertEqual(len(active_clocks), 3)
-        self.assertEqual(len(FactionClock.objects.all()), 4)
-
     def test_roll_clock(self):
-        # follow https://docs.python.org/3/library/unittest.mock.html
-        # to import unittest.mock and mock out response to Outcome.roll(dice)
-        # (Testing Outcome.roll should be in separate file)
-        # test to ensure that: rolling the clock works, that it throws an error
-        # if the faction has no clocks, and that it calls a `create()` method when
-        # the clock is completed
-        pass
+        controller = FactionController(
+            faction=Faction.objects.get(name="The McGuffins")
+        )
+
+        # Exceed max_segments, complete clock every time
+        controller._get_roll_increment = MagicMock(return_value=5)
+
+        clock = controller.roll_clock()
+        self.assertTrue(clock.completed)

@@ -8,11 +8,31 @@ class FactionController:
     def __init__(self, faction: Faction):
         self.faction = faction
 
-    def active_clocks(self) -> list[FactionClock]:
-        clocks = FactionClock.objects.filter(faction=self.faction, completed=False)
-        return list(clocks)
+    def _get_roll_increment(self, dice: int = 1) -> int:
+        roll = Outcome.roll(dice)
+        match roll:
+            case Outcome.FAILURE:
+                return 1
+            case Outcome.PARTIAL_SUCCESS:
+                return 2
+            case Outcome.SUCCESS:
+                return 3
+            case Outcome.CRITICAL_SUCCESS:
+                return 5
 
-    def roll_clock(self, dice=1, clock_id: int = None) -> bool:
+    def _get_active_clock(self) -> FactionClock:
+        clock = (
+            FactionClock.objects.active()
+            .filter(faction=self.faction)
+            .order_by("?")
+            .first()
+        )
+        if clock is None:
+            raise FactionClock.DoesNotExist(
+                "Expected faction to have existing objectives, found none."
+            )
+
+    def roll_clock(self, dice=1) -> FactionClock:
         """Roll the advancement of one of the faction's clocks
 
         Args:
@@ -20,36 +40,13 @@ class FactionController:
             clock_id (int, optional): The id of the clock to advance. Leave as None to select randomly. Defaults to None.
 
         Returns:
-            bool: The True/False value of whether the clock was completed
+            FactionClock: The FactionClock that was rolled
         """
-        if isinstance(clock_id, None):
-            clock = (
-                FactionClock.objects.active()
-                .filter(faction=self.faction)
-                .order_by("?")
-                .first()
-            )
-        else:
-            try:
-                clock = FactionClock.objects.active().get(id=clock_id)
-                if clock.faction != self.faction:
-                    raise FactionClock.DoesNotExist()
-            except:
-                error(f"no faction clock found for id {clock_id}")
-        if isinstance(clock, None):
-            raise FactionClock.DoesNotExist(
-                "Expected faction to have existing objectives, found none."
-            )
+        clock = self._get_active_clock()
 
         clock_controller = FactionClockController(faction_clock=clock)
 
-        roll = Outcome.roll(dice)
-        match roll:
-            case Outcome.FAILURE:
-                return clock_controller.increment_clock(1)
-            case Outcome.PARTIAL_SUCCESS:
-                return clock_controller.increment_clock(2)
-            case Outcome.SUCCESS:
-                return clock_controller.increment_clock(3)
-            case Outcome.CRITICAL_SUCCESS:
-                return clock_controller.increment_clock(5)
+        increment = self._get_roll_increment(dice)
+        clock_controller.increment_clock(increment)
+
+        return clock

@@ -13,6 +13,11 @@ from city_manager.models import (
 )
 
 
+@admin.register(Calendar)
+class CalendarAdmin(admin.ModelAdmin):
+    list_display = ("step",)
+
+
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
     list_display = ("name", "id")
@@ -59,8 +64,3 @@ class LandmarkAdmin(admin.ModelAdmin):
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     list_display = ("name", "district", "faction", "is_dead_or_deleted", "id")
-
-
-@admin.register(Calendar)
-class CalendarAdmin(admin.ModelAdmin):
-    list_display = ("step",)

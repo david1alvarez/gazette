@@ -25,13 +25,24 @@ from city_manager.tests.factory import (
 )
 
 
+class CalendarTests(TestCase):
+    def setUp(self):
+        CalendarFactory()
+        print(f"Calendar.objects.all(): {Calendar.objects.all()}")
+
+    def test_setup(self):
+        self.assertEqual(len(Calendar.objects.all()), 1)
+
+
 class CityTests(TestCase):
     def setUp(self):
-        CityFactory(name="paris")
+        city = CityFactory(name="paris")
         CityFactory()
+        FactionFactory.create_batch(2, city=city)
 
     def test_setup(self):
         self.assertEqual(len(City.objects.all()), 2)
+        self.assertEqual(len(City.objects.get(name="paris").faction_set.all()), 2)
 
     def test_str_method(self):
         city = City.objects.get(name="paris")
@@ -61,7 +72,7 @@ class FactionTests(TestCase):
 
 class FactionFactionRelationTests(TestCase):
     def setUp(self):
-        test_city = City.objects.create(name="test city")
+        test_city = CityFactory(name="test city")
         faction_1 = FactionFactory(name="The McGuffins", city=test_city)
         faction_2 = FactionFactory(name="The Unobtanium Seekers", city=test_city)
         FactionFactionRelation.objects.create(
@@ -182,11 +193,3 @@ class PersonTests(TestCase):
     def test_str_method(self):
         person = Person.objects.get(name="Hecate")
         self.assertEqual(str(person), person.name)
-
-
-class CalendarTests(TestCase):
-    def setUp(self):
-        CalendarFactory()
-
-    def test_setup(self):
-        self.assertEqual(len(Calendar.objects.all()), 1)
