@@ -181,7 +181,7 @@ class District(HistoricalModel):
     description = models.TextField(null=True, blank=True)
     scene = models.TextField(null=True, blank=True)
     streets_description = models.TextField(null=True, blank=True)
-    streets = ArrayField(models.CharField(max_length=100))
+    streets = ArrayField(models.CharField(max_length=100), null=True, blank=True)
     buildings_description = models.TextField(null=True, blank=True)
     traits = ArrayField(ArrayField(models.CharField(max_length=100)))
     city = models.ForeignKey(City, on_delete=models.CASCADE)
