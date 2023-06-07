@@ -14,13 +14,25 @@ from city_manager.models import (
     Person,
     World,
 )
+from django.contrib.auth.models import User
 
 
-class CalendarFactory(factory.django.DjangoModelFactory):
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.Faker("user_name")
+    email = factory.Faker("email")
+    password = factory.Faker("password")
+
+
+class WorldFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = World
 
-    step = factory.Faker("random_int", min=0)
+    name = factory.Faker("sentence", nb_words=2)
+    owner = factory.SubFactory(UserFactory)
+    clock_ticks = factory.Faker("random_int", min=0)
 
 
 class CityFactory(factory.django.DjangoModelFactory):
@@ -28,6 +40,7 @@ class CityFactory(factory.django.DjangoModelFactory):
         model = City
 
     name = factory.Faker("city")
+    world = factory.SubFactory(WorldFactory)
 
 
 class FactionFactory(factory.django.DjangoModelFactory):

@@ -14,7 +14,7 @@ from city_manager.models import (
     Person,
 )
 from city_manager.tests.factory import (
-    CalendarFactory,
+    WorldFactory,
     CityFactory,
     DistrictFactionFactory,
     DistrictFactory,
@@ -27,8 +27,7 @@ from city_manager.tests.factory import (
 
 class CalendarTests(TestCase):
     def setUp(self):
-        CalendarFactory()
-        print(f"Calendar.objects.all(): {World.objects.all()}")
+        WorldFactory()
 
     def test_setup(self):
         self.assertEqual(len(World.objects.all()), 1)

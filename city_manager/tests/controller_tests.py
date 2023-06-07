@@ -68,18 +68,14 @@ class FactionFactionRelationControllerTests(TestCase):
 class FactionControllerTests(TestCase):
     def setUp(self):
         faction = FactionFactory(name="The McGuffins")
-        FactionClockFactory.create_batch(
-            3, faction=faction, completed_segments=0, max_segments=4
-        )
-        FactionClockFactory(completed_segments=4, faction=faction)
+        FactionClockFactory(completed_segments=0, faction=faction)
 
     def test_roll_clock(self):
-        controller = FactionController(
-            faction=Faction.objects.get(name="The McGuffins")
-        )
+        faction = Faction.objects.get(name="The McGuffins")
+        faction = FactionController(faction=faction)
 
         # Exceed max_segments, complete clock every time
-        controller._get_roll_increment = MagicMock(return_value=5)
+        faction._get_roll_increment = MagicMock(return_value=5)
 
-        clock = controller.roll_clock()
+        clock = faction.roll_clock()
         self.assertTrue(clock.completed)

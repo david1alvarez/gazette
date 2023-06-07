@@ -1,7 +1,6 @@
 from city_manager.controllers.faction_clock import FactionClockController
 from city_manager.controllers.probability import Outcome
 from city_manager.models import Faction, FactionClock
-from logging import error
 
 
 class FactionController:
@@ -31,6 +30,7 @@ class FactionController:
             raise FactionClock.DoesNotExist(
                 "Expected faction to have existing objectives, found none."
             )
+        return clock
 
     def roll_clock(self, dice=1) -> FactionClock:
         """Roll the advancement of one of the faction's clocks
@@ -43,7 +43,6 @@ class FactionController:
             FactionClock: The FactionClock that was rolled
         """
         clock = self._get_active_clock()
-
         clock_controller = FactionClockController(faction_clock=clock)
 
         increment = self._get_roll_increment(dice)
