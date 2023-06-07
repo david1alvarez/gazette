@@ -102,9 +102,8 @@ class FactionClock(models.Model):
         (ClockObjectiveType.EXPAND_GANG, "expand gang"),
         (ClockObjectiveType.CLAIM_TERRITORY, "claim territory"),
     ]
-    objective_type = models.CharField(
+    objective_type = models.IntegerField(
         choices=OBJECTIVE_TYPES,
-        max_length=3,
         default=ClockObjectiveType.ACQUIRE_ASSET,
     )
     faction = models.ForeignKey(
