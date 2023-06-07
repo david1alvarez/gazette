@@ -7,8 +7,12 @@ import uuid
 
 
 class HistoricalModel(models.Model):
-    created = models.DateTimeField(default=timezone.now, blank=True)
+    created = models.DateTimeField(default=timezone.now, blank=True, editable=False)
     modified = models.DateTimeField(default=timezone.now, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.modified = timezone.now()
+        return super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
@@ -103,6 +107,25 @@ class ClockObjectiveType(Enum):
     def __int__(self):
         return self.value
 
+    def __str__(self):
+        return self.text
+
+    @property
+    def text(self):
+        match (self.value):
+            case 1:
+                return "acquire asset"
+            case 2:
+                return "contest rival"
+            case 3:
+                return "aid ally"
+            case 4:
+                return "remove rival"
+            case 5:
+                return "expand gang"
+            case 6:
+                return "claim territory"
+
 
 class FactionClockManager(models.Manager):
     def active(self) -> models.QuerySet[FactionClock]:
@@ -116,12 +139,12 @@ class FactionClock(HistoricalModel):
     completed_segments = models.PositiveIntegerField(default=0)
     completed = models.BooleanField(default=False)
     OBJECTIVE_TYPES: list[(ClockObjectiveType, int)] = [
-        (ClockObjectiveType.ACQUIRE_ASSET, "acquire asset"),
-        (ClockObjectiveType.CONTEST_RIVAL, "contest rival"),
-        (ClockObjectiveType.AID_ALLY, "aid ally"),
-        (ClockObjectiveType.REMOVE_RIVAL, "remove rival"),
-        (ClockObjectiveType.EXPAND_GANG, "expand gang"),
-        (ClockObjectiveType.CLAIM_TERRITORY, "claim territory"),
+        (1, ClockObjectiveType.ACQUIRE_ASSET),
+        (2, ClockObjectiveType.CONTEST_RIVAL),
+        (3, ClockObjectiveType.AID_ALLY),
+        (4, ClockObjectiveType.REMOVE_RIVAL),
+        (5, ClockObjectiveType.EXPAND_GANG),
+        (6, ClockObjectiveType.CLAIM_TERRITORY),
     ]
     objective_type = models.IntegerField(
         choices=OBJECTIVE_TYPES,
