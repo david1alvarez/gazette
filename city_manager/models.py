@@ -99,12 +99,12 @@ class FactionFactionRelation(HistoricalModel):
     source_faction = models.ForeignKey(
         Faction,
         on_delete=models.CASCADE,
-        related_name="relation_source_faction",
+        related_name="relation_as_source_faction",
     )
     target_faction = models.ForeignKey(
         Faction,
         on_delete=models.CASCADE,
-        related_name="relation_target_faction",
+        related_name="relation_as_target_faction",
     )
     target_reputation = models.IntegerField(default=0)
 
@@ -158,12 +158,12 @@ class FactionClock(HistoricalModel):
     faction = models.ForeignKey(
         Faction,
         on_delete=models.CASCADE,
-        related_name="clock_source_faction",
+        related_name="clocks_owned",
     )
     target_faction = models.ForeignKey(
         Faction,
         on_delete=models.SET_NULL,
-        related_name="clock_target_faction",
+        related_name="clocks_targeted_by",
         null=True,
         blank=True,
     )
