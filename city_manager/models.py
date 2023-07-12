@@ -20,7 +20,7 @@ class HistoricalModel(models.Model):
 
 class World(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(default="")
     owner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
     clock_ticks = models.PositiveBigIntegerField(default=0)
 
@@ -33,7 +33,7 @@ class World(HistoricalModel):
 
 class City(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(default="")
     world = models.ForeignKey(World, on_delete=models.CASCADE)
 
     class Meta:
@@ -52,17 +52,33 @@ class FactionManager(models.Manager):
 
 
 class Faction(HistoricalModel):
+    class HoldStrength(models.IntegerChoices):
+        WEAK = 0
+        STRONG = 1
+
+        def __str__(self):
+            return self.text
+
+        @property
+        def text(self):
+            match (self.value):
+                case 0:
+                    return "weak"
+                case 1:
+                    return "strong"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField(default="")
+    description = models.TextField(default="", blank=True)
     tier = models.PositiveIntegerField(default=0)
-    HOLD_STRENGTH = [("w", "weak"), ("s", "strong")]
-    hold = models.CharField(max_length=1, choices=HOLD_STRENGTH, default="s")
-    turf = models.TextField(null=True, blank=True)
-    headquarters = models.CharField(max_length=100, null=True, blank=True)
-    assets = models.TextField(null=True, blank=True)
-    quirks = models.TextField(null=True, blank=True)
-    current_situation = models.TextField(null=True, blank=True)
+    hold = models.IntegerField(
+        choices=HoldStrength.choices, default=HoldStrength.STRONG
+    )
+    turf = models.TextField(default="", blank=True)
+    headquarters = models.CharField(default="", blank=True)
+    assets = models.TextField(default="", blank=True)
+    quirks = models.TextField(default="", blank=True)
+    current_situation = models.TextField(default="", blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
 
@@ -97,59 +113,47 @@ class FactionFactionRelation(HistoricalModel):
         indexes = [models.Index(fields=["source_faction"])]
 
 
-class ClockObjectiveType(Enum):
-    ACQUIRE_ASSET = 1
-    CONTEST_RIVAL = 2
-    AID_ALLY = 3
-    REMOVE_RIVAL = 4
-    EXPAND_GANG = 5
-    CLAIM_TERRITORY = 6
-
-    def __int__(self):
-        return self.value
-
-    def __str__(self):
-        return self.text
-
-    @property
-    def text(self):
-        match (self.value):
-            case 1:
-                return "acquire asset"
-            case 2:
-                return "contest rival"
-            case 3:
-                return "aid ally"
-            case 4:
-                return "remove rival"
-            case 5:
-                return "expand gang"
-            case 6:
-                return "claim territory"
-
-
 class FactionClockManager(models.Manager):
     def active(self) -> models.QuerySet[FactionClock]:
         return self.filter(completed=False)
 
 
 class FactionClock(HistoricalModel):
+    class ObjectiveTypes(models.IntegerChoices):
+        ACQUIRE_ASSET = 1
+        CONTEST_RIVAL = 2
+        AID_ALLY = 3
+        REMOVE_RIVAL = 4
+        EXPAND_GANG = 5
+        CLAIM_TERRITORY = 6
+
+        def __str__(self):
+            return self.text
+
+        @property
+        def text(self):
+            match (self.value):
+                case 1:
+                    return "acquire asset"
+                case 2:
+                    return "contest rival"
+                case 3:
+                    return "aid ally"
+                case 4:
+                    return "remove rival"
+                case 5:
+                    return "expand gang"
+                case 6:
+                    return "claim territory"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(default="")
     max_segments = models.PositiveIntegerField(default=4)
     completed_segments = models.PositiveIntegerField(default=0)
     completed = models.BooleanField(default=False)
-    OBJECTIVE_TYPES: list[(ClockObjectiveType, int)] = [
-        (1, ClockObjectiveType.ACQUIRE_ASSET),
-        (2, ClockObjectiveType.CONTEST_RIVAL),
-        (3, ClockObjectiveType.AID_ALLY),
-        (4, ClockObjectiveType.REMOVE_RIVAL),
-        (5, ClockObjectiveType.EXPAND_GANG),
-        (6, ClockObjectiveType.CLAIM_TERRITORY),
-    ]
     objective_type = models.IntegerField(
-        choices=OBJECTIVE_TYPES,
-        default=ClockObjectiveType.ACQUIRE_ASSET,
+        choices=ObjectiveTypes.choices,
+        default=ObjectiveTypes.ACQUIRE_ASSET,
     )
     faction = models.ForeignKey(
         Faction,
@@ -170,21 +174,21 @@ class FactionClock(HistoricalModel):
         indexes = [models.Index(fields=["completed"]), models.Index(fields=["faction"])]
 
     def __str__(self) -> str:
-        return self.name
+        return self.name[:30]
 
     def __repr__(self):
-        return f"<FactionClock: {self.name}>"
+        return f"<FactionClock: {self.name[:30]}>"
 
 
 class District(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    scene = models.TextField(null=True, blank=True)
-    streets_description = models.TextField(null=True, blank=True)
-    streets = ArrayField(models.CharField(max_length=100), null=True, blank=True)
-    buildings_description = models.TextField(null=True, blank=True)
-    traits = ArrayField(ArrayField(models.CharField(max_length=100)))
+    name = models.CharField(default="")
+    description = models.TextField(default="", blank=True)
+    scene = models.TextField(default="", blank=True)
+    streets_description = models.TextField(default="", blank=True)
+    streets = ArrayField(models.CharField(), null=True, blank=True)
+    buildings_description = models.TextField(default="", blank=True)
+    traits = ArrayField(ArrayField(models.CharField()))
     city = models.ForeignKey(City, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -205,8 +209,8 @@ class DistrictFaction(HistoricalModel):
 
 class Landmark(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField(default="")
+    description = models.TextField(default="", blank=True)
     district = models.ForeignKey(
         District, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -228,10 +232,10 @@ class PersonManager(models.Manager):
 
 class Person(HistoricalModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField(default="")
+    description = models.TextField(default="", blank=True)
     adjectives = ArrayField(
-        models.CharField(max_length=100),
+        models.CharField(),
         default=list,
         null=True,
         blank=True,

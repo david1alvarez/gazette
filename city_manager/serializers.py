@@ -25,7 +25,6 @@ class FactionSerializer(serializers.ModelSerializer):
             "name",
             "tier",
             "hold",
-            "category",
             "turf",
             "headquarters",
             "assets",

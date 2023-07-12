@@ -424,23 +424,44 @@ class Migration(migrations.Migration):
                         choices=[
                             (
                                 1,
-                                city_manager.models.ClockObjectiveType["ACQUIRE_ASSET"],
+                                city_manager.models.FactionClock.ObjectiveTypes[
+                                    "ACQUIRE_ASSET"
+                                ],
                             ),
                             (
                                 2,
-                                city_manager.models.ClockObjectiveType["CONTEST_RIVAL"],
+                                city_manager.models.FactionClock.ObjectiveTypes[
+                                    "CONTEST_RIVAL"
+                                ],
                             ),
-                            (3, city_manager.models.ClockObjectiveType["AID_ALLY"]),
-                            (4, city_manager.models.ClockObjectiveType["REMOVE_RIVAL"]),
-                            (5, city_manager.models.ClockObjectiveType["EXPAND_GANG"]),
+                            (
+                                3,
+                                city_manager.models.FactionClock.ObjectiveTypes[
+                                    "AID_ALLY"
+                                ],
+                            ),
+                            (
+                                4,
+                                city_manager.models.FactionClock.ObjectiveTypes[
+                                    "REMOVE_RIVAL"
+                                ],
+                            ),
+                            (
+                                5,
+                                city_manager.models.FactionClock.ObjectiveTypes[
+                                    "EXPAND_GANG"
+                                ],
+                            ),
                             (
                                 6,
-                                city_manager.models.ClockObjectiveType[
+                                city_manager.models.FactionClock.ObjectiveTypes[
                                     "CLAIM_TERRITORY"
                                 ],
                             ),
                         ],
-                        default=city_manager.models.ClockObjectiveType["ACQUIRE_ASSET"],
+                        default=city_manager.models.FactionClock.ObjectiveTypes[
+                            "ACQUIRE_ASSET"
+                        ],
                     ),
                 ),
                 (

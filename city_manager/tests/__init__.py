@@ -2,7 +2,7 @@ from .model_tests import (
     CityTests,
     FactionTests,
     FactionFactionRelationTests,
-    ClockObjectiveTypeTests,
+    FactionClockObjectiveTypesTests,
     FactionClockTests,
     DistrictTests,
     DistrictFactionTests,

@@ -4,7 +4,6 @@ import factory
 
 from city_manager.models import (
     City,
-    ClockObjectiveType,
     District,
     DistrictFaction,
     Faction,
@@ -49,8 +48,7 @@ class FactionFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("sentence", nb_words=2)
     tier = factory.Faker("random_int", min=0, max=5)
-    hold = factory.Faker("random_element", elements=("w", "s"))
-    category = factory.Faker("sentence", nb_words=2)
+    hold = factory.Faker("random_element", elements=(0, 1))
     turf = factory.Faker("sentences")
     headquarters = factory.Faker("sentence")
     assets = factory.Faker("texts", max_nb_chars=50)
@@ -77,7 +75,7 @@ class FactionClockFactory(factory.django.DjangoModelFactory):
         max_segments = factory.Faker("random_int", min=0, max=8, step=2)
 
     name = factory.Faker("sentence")
-    objective_type = factory.Faker("enum", enum_cls=ClockObjectiveType)
+    objective_type = factory.Faker("enum", enum_cls=FactionClock.ObjectiveTypes)
     completed = factory.LazyAttribute(lambda o: o.max_segments <= o.completed_segments)
     faction = factory.SubFactory(FactionFactory)
 
@@ -116,6 +114,7 @@ class LandmarkFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("sentence", nb_words=3)
     description = factory.Faker("paragraph")
     district = factory.SubFactory(DistrictFactory)
+    city = factory.SubFactory(CityFactory)
 
 
 class PersonFactory(factory.django.DjangoModelFactory):

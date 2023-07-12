@@ -8,7 +8,6 @@ from city_manager.models import (
     DistrictFaction,
     Faction,
     FactionClock,
-    ClockObjectiveType,
     FactionFactionRelation,
     Landmark,
     Person,
@@ -46,11 +45,6 @@ class CityTests(TestCase):
     def test_str_method(self):
         city = City.objects.get(name="paris")
         self.assertEqual(str(city), city.name)
-
-    def test_name_length_exception(self):
-        too_long_name = "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij"
-        with self.assertRaises(DataError):
-            City.objects.create(name=too_long_name)
 
 
 class FactionTests(TestCase):
@@ -102,14 +96,14 @@ class FactionFactionRelationTests(TestCase):
         self.assertNotEqual(relation_1.target_reputation, relation_2.target_reputation)
 
 
-class ClockObjectiveTypeTests(TestCase):
+class FactionClockObjectiveTypesTests(TestCase):
     def test_string_representation(self):
-        self.assertEqual(1, int(ClockObjectiveType.ACQUIRE_ASSET))
-        self.assertEqual(2, int(ClockObjectiveType.CONTEST_RIVAL))
-        self.assertEqual(3, int(ClockObjectiveType.AID_ALLY))
-        self.assertEqual(4, int(ClockObjectiveType.REMOVE_RIVAL))
-        self.assertEqual(5, int(ClockObjectiveType.EXPAND_GANG))
-        self.assertEqual(6, int(ClockObjectiveType.CLAIM_TERRITORY))
+        self.assertEqual(1, int(FactionClock.ObjectiveTypes.ACQUIRE_ASSET))
+        self.assertEqual(2, int(FactionClock.ObjectiveTypes.CONTEST_RIVAL))
+        self.assertEqual(3, int(FactionClock.ObjectiveTypes.AID_ALLY))
+        self.assertEqual(4, int(FactionClock.ObjectiveTypes.REMOVE_RIVAL))
+        self.assertEqual(5, int(FactionClock.ObjectiveTypes.EXPAND_GANG))
+        self.assertEqual(6, int(FactionClock.ObjectiveTypes.CLAIM_TERRITORY))
 
 
 class FactionClockTests(TestCase):
@@ -119,7 +113,7 @@ class FactionClockTests(TestCase):
         target_faction = FactionFactory(name="Emperor Supreme", city=test_city)
         FactionClock.objects.create(
             name="Assassinate the emperor",
-            objective_type=ClockObjectiveType.REMOVE_RIVAL,
+            objective_type=FactionClock.ObjectiveTypes.REMOVE_RIVAL,
             faction=faction,
             target_faction=target_faction,
         )
@@ -135,7 +129,7 @@ class FactionClockTests(TestCase):
 
     def test_str_method(self):
         clock = FactionClock.objects.get(name="Assassinate the emperor")
-        self.assertEqual(str(clock), clock.name)
+        self.assertEqual(str(clock), clock.name[:30])
 
     def test_active(self):
         faction = Faction.objects.get(name="The McGuffins")
